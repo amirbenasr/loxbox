@@ -36,9 +36,8 @@ class Loxbox extends Module
     {
 
         return parent::install()
-            && $this->registerHook('Header')
-            && $this->registerHook('displayTopColumn')
-            && $this->registerHook('displayBeforeCarrier')
+
+            && $this->registerHook('displayCarrierList')
             && Configuration::updateValue('Loxbox', 'default-token')
             && $this->installDb();
              
@@ -148,7 +147,7 @@ class Loxbox extends Module
 return true;
     }
 
-    public function hookDisplayBeforeCarrier() 
+    public function hookDisplayCarrierList() 
     {
         $this->context->controller->addJs(array(
             $this->_path.'views/js/list.js'

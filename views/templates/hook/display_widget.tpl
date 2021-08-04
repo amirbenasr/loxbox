@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
   <head>
    
@@ -35,7 +34,6 @@
       </div>
       <div class="results">
         <div class="list">
-          <form action="POST" id="formSubmit">
             <h2>Loxbox</h2>
             <p>
               Type something in the input field to search the list for specific
@@ -67,12 +65,12 @@
             <ul class="list-group" id="myList">
              
             </ul>
-          </form>
         </div>
         <div id="map"></div>
       </div>
     </div>
 
-
   </body>
+
+
 </html>
