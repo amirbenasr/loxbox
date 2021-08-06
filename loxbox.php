@@ -56,7 +56,8 @@ class Loxbox extends Module
     public function uninstallDb()
     {
         $db = Db::getInstance();
-        $query ='SELECT (id_carrier) from ps_carrier where external_module_name="loxbox"';
+        $name = 'Loxbox';
+        $query ='SELECT (id_carrier) from ps_carrier where external_module_name=$name';
         $id = $db->getValue($query);
 
         $db->delete('carrier','id_carrier = '.(int)$id.'');
