@@ -53,9 +53,13 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore {
         }
         else if (Tools::getValue('address1') && Tools::getValue('ajax'))
         {
-           
+           $name="Loxbox";
             $db = Db::getInstance();
-            $sql = "SELECT COUNT(*) FROM ps_address WHERE id_customer=$user_id and  id_address=(SELECT max(id_address) FROM ps_address);";
+            $sql = "SELECT * from ps_customer where id_customer=$user_id";
+            $row = $db->getRow($sql);
+            $user = new Customer();
+            $user->getCustomersByEmail($row->email);
+            $sql = "SELECT COUNT(*) FROM ps_address WHERE id_customer=$user_id and other=$name and id_address=(SELECT max(id_address) FROM ps_address);";
             $count = $db->getValue($sql);
 
             if( $count !=0 )
@@ -66,9 +70,22 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore {
                     'address1'=>Tools::getValue('address1'),
                     'city'=>Tools::getValue('City'),
                     'postcode'=>Tools::getValue('Zipcode')
-                ),'id_customer='.(int)$user_id);
+                ),'id_customer='.(int)$user_id).' other='.$name.'';
 
-            };
+            }
+            else if($count==0) {
+                $db->insert('address',array(
+                    'alias'=>Tools::getValue('Name'),
+                    'address1'=>Tools::getValue('address1'),
+                    'firstname'=>$user->firstname,
+                    'lastname'=>$user->lastname,
+                    'firstname'=>$user->lastname,
+                    'city'=>Tools::getValue('City'),
+                    'id_country'=>210,
+                    'other'=>$name,
+                    'postcode'=>Tools::getValue('Zipcode')
+                ),'id_customer='.(int)$user_id);
+            }
             
         }
         

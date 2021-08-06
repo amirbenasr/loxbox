@@ -47,8 +47,8 @@ class Loxbox extends Module
   
     public function uninstall(): bool
     {
-        return (parent::uninstall()
-            && Configuration::deleteByName('Loxbox'))
+        return parent::uninstall()
+            && Configuration::deleteByName('Loxbox')
             && $this->uninstallDb();
     }
 
@@ -56,11 +56,13 @@ class Loxbox extends Module
     public function uninstallDb()
     {
         $db = Db::getInstance();
-        $name = 'Loxbox';
-        $query ='SELECT (id_carrier) from ps_carrier where external_module_name=$name';
+        $query ='SELECT (id_carrier) from ps_carrier where external_module_name="Loxbox"';
         $id = $db->getValue($query);
+      
 
-        $db->delete('carrier','id_carrier = '.(int)$id.'');
+       $db->delete('carrier', '`id_carrier` = '.(int)$id);
+
+  
         $db->delete('carrier_lang','id_carrier = '.(int)$id.'');
         $db->delete('carrier_group','id_carrier = '.(int)$id.'');
         $db->delete('carrier_lang','id_carrier = '.(int)$id.'');
@@ -101,15 +103,20 @@ class Loxbox extends Module
 
         $db = Db::getInstance();
         
-        $sql = 'SELECT MAX(id_carrier) FROM '._DB_PREFIX_.'carrier';
+        // $sql = 'SELECT MAX(id_carrier) FROM '._DB_PREFIX_.'carrier';
+        $sql = "SELECT AUTO_INCREMENT - 1 as CurrentId FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '"._DB_NAME_."' AND TABLE_NAME = '"._DB_PREFIX_."carrier' ";
+       
         $totalCarriers = Db::getInstance()->getValue($sql);
-        
+        Configuration::set('PS_CARRIER_DEFAULT',$totalCarriers+1);
+
         $db->insert('carrier',array(
             'id_reference'=>(int)$totalCarriers+1,
             'name'=>'loxbox',
             'external_module_name'=>'Loxbox',
             'active'=>(int)1,
             'is_free'=>(int)0,
+            'shipping_handling'=>(int)0,
+            
             
         ));
 
@@ -117,7 +124,15 @@ class Loxbox extends Module
             'id_carrier'=>(int)$totalCarriers+1,
             'id_shop'=>(int)1,
             'price'=>4.000000,
-            'id_range_weight'=>6            
+            'id_zone'=>(int)4,
+            'id_range_weight'=>(int)6            
+        ));
+
+        $db->insert('range_weight',array(
+            'id_carrier'=>(int)$totalCarriers+1,
+            'delimiter1'=>(int)0.000000,
+            'delimiter2'=>0.100000,
+                      
         ));
 
         $db->insert('carrier_lang',array(
@@ -130,7 +145,7 @@ class Loxbox extends Module
             'id_carrier'=>(int)$totalCarriers+1,
             'id_shop'=>(int)1,
             'id_lang'=>(int)2,
-            'delay'=>"Livraison entre 24/48 heures"
+            'delay'=>"Livraison entre "
         ));
         $db->insert('carrier_zone',array(
             'id_carrier'=>(int)$totalCarriers+1,
@@ -152,7 +167,7 @@ class Loxbox extends Module
             'id_carrier'=>(int)$totalCarriers+1,
             'id_shop'=>(int)1,
         ));
-        copy(_PS_MODULE_DIR_.'loxbox/logo.png', _PS_SHIP_IMG_DIR_ . '/' . (int) $totalCarriers+1 . '.png');
+       // copy(_PS_MODULE_DIR_.'loxbox/logo.png', _PS_SHIP_IMG_DIR_ . '/' . (int) $totalCarriers+1 . '.png');
   
 return true;
     }
