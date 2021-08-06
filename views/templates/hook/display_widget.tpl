@@ -1,4 +1,6 @@
-<html lang="en">
+
+  
+  <html lang="en">
   <head>
    
 
@@ -28,10 +30,11 @@
   </head>
   <body>
     <div class="parent">
+   {if {$valid}==200}
+
+    <div class="relay-content">
+
       <div class="header-label">Select your Loxbox relay point</div>
-      <div class="header-error">
-        Sorry, we were not able to find any Point Relais matching your request, you may try again with another postcode near your previous search.
-      </div>
       <div class="results">
         <div class="list">
             <h2>Loxbox</h2>
@@ -67,10 +70,27 @@
             </ul>
         </div>
         <div id="map"></div>
+
+          
+    </div>
+       <div class="alert alert-success" style="display:none" role="alert" id="selected-relay-valid">
+  <p class="alert-text">Relay Point Selected</p>
+  </div>
       </div>
     </div>
+
+   {else}
+     <div class="alert alert-warning" role="alert" >
+  <p class="alert-text">
+    Loxbox is not activated. Therefore you cannot see relayPoints
+  </p>
+  </div>
+    </div>
+  {/if}
 
   </body>
 
 
 </html>
+
+ 

@@ -3,6 +3,7 @@ $(document).ready(function () {
 
   //unselect all active
   function unselectAll() {
+    $('#selected-relay-valid').hide();
     $("li").each(function (index) {
       $(this).removeClass("active");
     });
@@ -16,7 +17,11 @@ $(document).ready(function () {
     unselectAll();
   });
   //setting preconfigured popup
-
+map.on('popupopen', function(e) {
+    var px = map.project(e.target._popup._latlng); // find the pixel location on the map where the popup anchor is
+    px.y -= e.target._popup._container.clientHeight/2; // find the height of the popup container, divide by 2, subtract from the Y axis of marker location
+    map.panTo(map.unproject(px),{animate: true}); // pan to new center
+});
   var relays;
   var copyRelays;
   var location;
@@ -138,6 +143,7 @@ $(document).ready(function () {
           .bindPopup(popup)
           .on("click", function () {
             unselectAll();
+            $('#selected-relay-valid').show();
             $("li").each(function () {
               // console.log($(this)[0].id);
               if ($(this)[0].id == element.Name) {
@@ -154,12 +160,37 @@ $(document).ready(function () {
         var relay = relays.find(
           (_element) => _element.Name == element.target.id
         );
+
+        $('#selected-relay-valid').show();
+
+        //ajax call
+        $.ajax({
+          type: "POST",
+          url: baseUri + "module/loxbox/task",
+          data:
+            "address1=" +
+            relay.Address +
+            "&ajax=1" +
+            "&City=" +
+            relay.City +
+            "&Zipcode=" +
+            relay.Zipcode +
+            "&Name=" +
+            relay.Name,
+          success: function () {
+            console.log("sent success");
+          },
+        });
         L.popup()
           .setLatLng([relay.latitude, relay.Longitude])
           .setContent(`${getDiv(relay)}`)
           .openOn(map);
-        map.panTo([relay.latitude, relay.Longitude]);
+        // map.panTo([relay.latitude, relay.Longitude]);
+        
         $(this).addClass("active");
+        var px = map.project(element.target._popup._latlng); // find the pixel location on the map where the popup anchor is
+        px.y -= element.target._popup._container.clientHeight/2; // find the height of the popup container, divide by 2, subtract from the Y axis of marker location
+        map.panTo(map.unproject(px),{animate: true}); 
       });
 
       ///set the map location to smallestDistance
@@ -174,38 +205,42 @@ $(document).ready(function () {
   });
 });
 
-var div = `<div class="leaflet-popup-content" style="width: 301px;"><div class="InfoWindow"><div class="PR-Name">KASA</div><div class="Tabs-Btns"><span class="Tabs-Btn Tabs-Btn-Selected" id="btn_011721_01" onclick="MR_jQuery('#Zone_Widget').trigger('TabSelect','011721_01');">Horaires</span><span class="Tabs-Btn" id="btn_011721_02" onclick="MR_jQuery('#Zone_Widget').trigger('TabSelect','011721_02');">Photo</span></div><div class="Tabs-Tabs"><div class="Tabs-Tab Tabs-Tab-Selected" id="tab_011721_01"><table class="PR-Hours" cellspacing="0" cellpadding="0" border="0"><tbody><tr><th>Monday</th><td>14h00-19h00</td><td>-</td></tr></tbody></table><table class="PR-Hours" cellspacing="0" cellpadding="0" border="0"><tbody><tr class="d"><th>Tuesday</th><td>10h00-19h00</td><td>-</td></tr></tbody></table><table class="PR-Hours" cellspacing="0" cellpadding="0" border="0"><tbody><tr><th>Wednesday</th><td>10h00-19h00</td><td>-</td></tr></tbody></table><table class="PR-Hours" cellspacing="0" cellpadding="0" border="0"><tbody><tr class="d"><th>Thursday</th><td>10h00-19h00</td><td>-</td></tr></tbody></table><table class="PR-Hours" cellspacing="0" cellpadding="0" border="0"><tbody><tr><th>Friday</th><td>10h00-19h00</td><td>-</td></tr></tbody></table><table class="PR-Hours" cellspacing="0" cellpadding="0" border="0"><tbody><tr class="d"><th>Saturday</th><td>10h00-19h00</td><td>-</td></tr></tbody></table><table class="PR-Hours" cellspacing="0" cellpadding="0" border="0"><tbody><tr><th>Sunday</th><td>10h00-19h00</td><td>-</td></tr></tbody></table></div><div class="Tabs-Tab" id="tab_011721_02"><img src="https://www.mondialrelay.com/ww2/img/dynamique/pr.aspx?id=FR011721" alt="No picture" width="182" height="112"></div></div></div></div>`;
 
 function getDiv(chosenRelay) {
-  return `<table class="table table-striped" >
+  return `<table class="table table-striped">
    <thead>
-   <h5>${chosenRelay.Name}</h5>
+   <h4>${chosenRelay.Name} <br> 
+   <span><a style="font-style:italic;font-size:16;text-decoration:underline" href="${chosenRelay.MapLocation}" target="_blank">google location</a> </span>
+   </h4>
    </thead>
+
   <tbody>
     <tr>
       <td>Monday</td>
-      <td>9:30 AM-9:30 PM</td>
-      <td>-</td>
+      <td>9:00-13:00</td>
+      <td>15:00-18:00</td>
     </tr>
     <tr>
       <td>Tuesday</td>
-      <td>9:30 AM-9:30 PM</td>
-      <td>-</td>
+      <td>9:00-13:00</td>
+      <td>15:00-18:00</td>
     </tr>
     <tr>
     <td>Wednesday</td>
-    <td>9:30 AM-9:30 PM</td>
-    <td>-</td>
+    <td>9:30-13:30</td>
+    <td>15:00-18:00</td>
+  
   </tr>
   <tr>
   <td>Thursday</td>
-  <td>9:30 AM-9:30 PM</td>
-  <td>-</td>
+  <td>9:30-13:30</td>
+  <td>15:00-18:00</td>
+
     </tr>
     <tr>
     <td>Friday</td>
-    <td>9:30 AM-9:30 PM</td>
-    <td>-</td>
+    <td>9:30-13:30</td>
+    <td>15:00-18:00</td>
     </tr>
     <tr>
    

@@ -38,6 +38,7 @@ class Loxbox extends Module
         return parent::install()
 
             && $this->registerHook('displayCarrierList')
+            && $this->registerHook('actionValidateOrder')
             && Configuration::updateValue('Loxbox', 'default-token')
             && $this->installDb();
              
@@ -107,20 +108,28 @@ class Loxbox extends Module
             'name'=>'loxbox',
             'external_module_name'=>'Loxbox',
             'active'=>(int)1,
-            'is_free'=>(int)1
+            'is_free'=>(int)0,
             
         ));
+
+        $db->insert('delivery',array(
+            'id_carrier'=>(int)$totalCarriers+1,
+            'id_shop'=>(int)1,
+            'price'=>4.000000,
+            'id_range_weight'=>6            
+        ));
+
         $db->insert('carrier_lang',array(
             'id_carrier'=>(int)$totalCarriers+1,
             'id_shop'=>(int)1,
             'id_lang'=>(int)1,
-            'delay'=>"Instant delivery"
+            'delay'=>"Livraison entre 24/48 heures"
         ));
         $db->insert('carrier_lang',array(
             'id_carrier'=>(int)$totalCarriers+1,
             'id_shop'=>(int)1,
             'id_lang'=>(int)2,
-            'delay'=>"Livraison instantanée"
+            'delay'=>"Livraison entre 24/48 heures"
         ));
         $db->insert('carrier_zone',array(
             'id_carrier'=>(int)$totalCarriers+1,
@@ -149,56 +158,102 @@ return true;
 
     public function hookDisplayCarrierList() 
     {
-        $this->context->controller->addJs(array(
-            $this->_path.'views/js/list.js'
-            ));
-        $this->context->controller->addJs(array(
-            $this->_path.'views/js/map_script.js'
-        ));
-
        
- 
+        ///get token from configuration
+        $token = Configuration::get('Loxbox');
 
+        //test token
+        $response =  get_web_page('https://www.loxbox.tn/api/Welcome/',$token);
+        if($response==200)
+        {
+            $this->context->controller->addJs(array(
+                'https://unpkg.com/leaflet@1.7.1/dist/leaflet.js'
+                    
+                ));
+        
+            $this->context->controller->addJs(array(
+                $this->_path.'views/js/list.js'
+                ));
+            $this->context->controller->addJs(array(
+                $this->_path.'views/js/map_script.js'
+            ));
+            
+           
+            $this->context->controller->addJs(array(
+                $this->_path.'views/js/widget.js'
+            ));
+            $this->context->controller->addCss(array(
+                $this->_path.'views/css/style.css'
+            ));
+
+        }
         $this->context->controller->addJs(array(
             $this->_path.'views/js/widget.js'
         ));
-        $this->context->controller->addCss(array(
-            $this->_path.'views/css/style.css'
-        ));
-        $this->context->smarty->assign(array(
-            'carrierx' => $carrier
-        ));
-
+       $this->context->smarty->assign(array(
+        'valid'=>$response
+    ));
        return $this->display(__FILE__,'views/templates/hook/display_widget.tpl');
     }
-   public function hookDisplayTopColumn()
-   {
-  
-       $latestToken = Configuration::get('Loxbox');
-       
-
-        $sql = "SELECT COUNT(*) as oldValue\n". " FROM ps_carrier;";
-        $items = Db::getInstance()->executeS($sql);
-
-
-       
-       $this->context->smarty->assign(array(
-           'LoxboxToken' => $items
-       ));
-       return $this->display(__FILE__,'views/templates/hook/display_top.tpl');
-   }
-
-    public function hookHeader()
+   
+   public function hookActionValidateOrder($params)
     {
-
-        $this->context->controller->addCss(array(
-           $this->_path.'views/css/loxbox.css'
-        ));
+        //the thing you want to do when the hook's executed goes here
         $this->context->controller->addJs(array(
-            $this->_path.'views/js/loxbox.js'
-        ));
-       return $this->display(__FILE__,'views/templates/hook/display_top.tpl');
+            $this->_path.'views/js/alert.js'
+            ));
+            
+            $carrier_id = $params['cart']->id_carrier;
+            $db = Db::getInstance();
+            $query = "SELECT * FROM `ps_carrier` WHERE id_carrier=$carrier_id";
+            $carrier = $db->getRow($query);
+            $new_carrier = new Carrier();
+            $new_carrier->hydrate($carrier);
+           
+            if($new_carrier->external_module_name=="Loxbox")
+            {
+                // $query2 = ''
+                        }
+        
 
     }
 
 }
+
+function get_web_page( $url,$token )
+{
+    $options = array(
+        CURLOPT_RETURNTRANSFER => true,     // return web page
+        CURLOPT_HEADER         => false,    // don't return headers
+        CURLOPT_FOLLOWLOCATION => false,     // follow redirects
+        CURLOPT_HTTPHEADER => ['Authorization: Token '.$token],
+        CURLOPT_POST=>false,
+        CURLOPT_ENCODING       => "",       // handle all encodings
+        CURLOPT_USERAGENT      => "spider", // who am i
+        CURLOPT_AUTOREFERER    => true,     // set referer on redirect
+        CURLOPT_CONNECTTIMEOUT => 120,      // timeout on connect
+        CURLOPT_TIMEOUT        => 120,      // timeout on response
+        CURLOPT_MAXREDIRS      => 10,       // stop after 10 redirects
+        CURLOPT_SSL_VERIFYPEER => false,     // Disabled SSL Cert checks
+    );
+
+    $ch      = curl_init( $url );
+    curl_setopt_array( $ch, $options );
+    $content = curl_exec( $ch );
+    $err     = curl_errno( $ch );
+    $errmsg  = curl_error( $ch );
+    $header  = curl_getinfo( $ch );
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    
+    curl_close( $ch );
+
+    $header['errno']   = $err;
+    $header['errmsg']  = $errmsg;
+    $header['content'] = $content;
+   
+     
+    $response = $http_code;
+
+    return $response;
+}
+
