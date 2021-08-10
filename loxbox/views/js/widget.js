@@ -1,24 +1,10 @@
 $(document).ready(function () {
   ///global
-    if(isLoxbox==true)
-    {
-      $('.parent').show();
-    }
-    else {
-      $('.parent').hide();
 
-    }
-    $(document).on("submit", "#form", function (e) {
-      return (
-        (SELECTED) ||
-        (e.preventDefault(),
-        e.stopPropagation(),
-        alert('You must select a Relay Point'))
-      );
-    });
   var selectedI;
-  $(".delivery_options").on("change", function () {
-    var value = $('.delivery_option_radio:checked', "#form").val();
+  $("#form input").on("change", function () {
+    var value = $('input[name="delivery_option[5]"]:checked', "#form").val();
+
     selectedI = value.slice(0, -1);
     var parent = $(".parent");
     var relay = $('.relay-content');
@@ -33,6 +19,7 @@ $(document).ready(function () {
         var carrier = body.message;
 
         if (carrier.external_module_name === "Loxbox") {
+       
           parent.show();
         } else {
           parent.hide();

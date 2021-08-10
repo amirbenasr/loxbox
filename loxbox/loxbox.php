@@ -152,14 +152,6 @@ class Loxbox extends Module
             'id_carrier'=>(int)$totalCarriers+1,
             'id_zone'=>(int)4,
         ));
-        $db->insert('carrier_zone',array(
-            'id_carrier'=>(int)$totalCarriers+1,
-            'id_zone'=>(int)1,
-        ));
-        $db->insert('carrier_zone',array(
-            'id_carrier'=>(int)$totalCarriers+1,
-            'id_zone'=>(int)2,
-        ));
         $db->insert('carrier_group',array(
             'id_carrier'=>(int)$totalCarriers+1,
             'id_group'=>(int)1,
@@ -184,18 +176,10 @@ class Loxbox extends Module
 
     public function hookDisplayCarrierList() 
     {
-      
+       
         ///get token from configuration
         $token = Configuration::get('Loxbox');
-        $id_carrier = $this->context->cart->id_carrier;
-        $db = Db::getInstance();
-        $query = "SELECT * FROM `ps_carrier` WHERE id_carrier=$id_carrier";
-        $carrier = $db->getRow($query);
-        $new_carrier = new Carrier();
-        $new_carrier->hydrate($carrier);    
-            Media::addJsDef(array(
-            'isLoxbox' => $new_carrier->external_module_name=="Loxbox"
-        ));
+
         //test token
         $response =  get_web_page('https://www.loxbox.tn/api/Welcome/',$token);
         if($response==200)
@@ -204,9 +188,9 @@ class Loxbox extends Module
                 'https://unpkg.com/leaflet@1.7.1/dist/leaflet.js'   
                 ));
         
-            // $this->context->controller->addJs(array(
-            //     $this->_path.'views/js/list.js'
-            //     ));
+            $this->context->controller->addJs(array(
+                $this->_path.'views/js/list.js'
+                ));
             $this->context->controller->addJs(array(
                 $this->_path.'views/js/map_script.js'
             ));
@@ -243,10 +227,10 @@ class Loxbox extends Module
             $new_carrier = new Carrier();
             $new_carrier->hydrate($carrier);
            
-            // if($new_carrier->external_module_name=="Loxbox")
-            // {
-            //     // $query2 = ''
-            //             }
+            if($new_carrier->external_module_name=="Loxbox")
+            {
+                // $query2 = ''
+                        }
         
 
     }

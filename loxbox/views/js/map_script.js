@@ -1,10 +1,8 @@
-var SELECTED=false;
 $(document).ready(function () {
   console.log("test");
 
   //unselect all active
   function unselectAll() {
-    SELECTED=false;
     $('#selected-relay-valid').hide();
     $("li").each(function (index) {
       $(this).removeClass("active");
@@ -150,7 +148,6 @@ map.on('popupopen', function(e) {
               // console.log($(this)[0].id);
               if ($(this)[0].id == element.Name) {
                 $(this).addClass("active");
-                SELECTED=true;
               }
             });
           });
@@ -159,7 +156,7 @@ map.on('popupopen', function(e) {
       $("li").on("click", function (element) {
         console.log(element.target.id);
         unselectAll();
-        SELECTED=true;
+
         var relay = relays.find(
           (_element) => _element.Name == element.target.id
         );
