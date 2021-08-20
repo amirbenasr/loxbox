@@ -93,8 +93,26 @@ label .input1{
   padding: 2px;
 
 }
-.MRW-Container{
-}
+
 .button {
+  display: inline;
+}
+
+
+@media (max-width:768px) {
+  
+  #map {
+    display: none;
+  }
+
+  .list {
+    width: 100%;
+  }
+  .list >  p , label ,#button ,#cityInput, #zipInput {
+    display: none;
+  }
+}
+
+p{
   display: inline;
 }

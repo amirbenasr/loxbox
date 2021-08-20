@@ -1,2 +1,0 @@
-loxbox task
-{$message}

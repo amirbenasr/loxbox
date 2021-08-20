@@ -34,32 +34,23 @@
 
     <div class="relay-content">
 
-      <div class="header-label">Select your Loxbox relay point</div>
+      <div class="header-label">Localiser un point relais :</div>
       <div class="results">
         <div class="list">
-            <h2>Loxbox</h2>
-            <p>
-              Type something in the input field to search the list for specific
-              items:
-            </p>
-            <label for="">city name :</label>
-            <input
-              class="form-control"
-              id="cityInput"
-              type="text"
-              name="city"
-              placeholder="Search.."
-            />
-            
-            <label for="">zip code :</label>
+            <h2>Choisir le point relais le plus proche :</h2>
+      <label class="col-sm-2" for="city">Ville :</label>
+      <div class="col-sm-6 col-md-4">
+        <select id="city" class="form-control">
+        <option>Tous</option>
+       
+        </select> 
+      </div>
+        
+         
+               
 
-            <input
-              class="form-control"
-              id="zipInput"
-              type="text"
-              name="pc"
-              placeholder="Search.."
-            />
+         <br>
+            <br>
             <button type="submit" class="btn pull-right" id="button" >
               Search
             </button>
@@ -71,18 +62,18 @@
         </div>
         <div id="map"></div>
 
-          
+          <div class="alert alert-success" style="display:none" role="alert" id="selected-relay-valid">
+  <p class="alert-text">Point relais sélectionné - <span id="selectedRelay"></span></p> 
+  </div>  
     </div>
-       <div class="alert alert-success" style="display:none" role="alert" id="selected-relay-valid">
-  <p class="alert-text">Relay Point Selected</p>
-  </div>
+     
       </div>
     </div>
 
    {else}
      <div class="alert alert-warning" role="alert" >
   <p class="alert-text">
-    Loxbox is not activated. Therefore you cannot see relayPoints
+    Le module LoxBox n'est pas activé. Pour plus d'informations contacter : <a href="mailto:contact@loxbox.tn">contact@loxbox.tn</>
   </p>
   </div>
     </div>

@@ -1,1 +1,1 @@
-alert("executing a hook");
+alert("executing a hook")

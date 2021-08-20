@@ -18,32 +18,15 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore {
     {
         parent::initContent();
         $user_id = $this->context->cart->id_customer;
-        if(Tools::getValue('ajax') && Tools::getValue("product_id")){
+        if(Tools::getValue('ajax') && Tools::getValue("product_id"))
+        {
             
             $carrier_id = (int)Tools::getValue("product_id");
-            $carrier = Carrier::getCarrierByReference($carrier_id);
-          
+            $carrier = new Carrier();
+            $db = Db::getInstance();
+            $query = "SELECT * FROM `ps_carrier` WHERE id_carrier=$carrier_id";
+            $carrier->hydrate($db->getRow($query));
 
-          
-          
-          
-            // $id_customer=2;
-            // $sql1 = "SELECT * FROM ps_address WHERE id_customer=$id_customer and  id_address=(SELECT max(id_address) FROM ps_address);";
-            // $sql = "SELECT COUNT(*) FROM ps_address WHERE id_customer=$id_customer and  id_address=(SELECT max(id_address) FROM ps_address);";
-
-            // $last_address = $db->getRow($sql1);
-            // $new_address = new Address();
-            // $new_address->hydrate($last_address);
-            // $addresses = $db->getVAlue($sql);
-            // var_dump($db->getValue($sql3));
-            // die;
-            // if($addresses!=0)
-            // {
-
-            // $sql3 = "UPDATE `ps_address` SET `alias` = \'loxlox`', `address1` = 'azdazd', `city` = 'zz', `other` = 'bb' WHERE `ps_address`.`id_address` = 6;";
-
-               
-            // }
             $json = array(
                 'status' => 'error',
                 'message' => $carrier,
@@ -68,13 +51,20 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore {
 
             if( $count !=0 )
             {
+                
+
+$sql = "SELECT MAX(id_address) from ps_address \n"
+
+. "where id_customer=$user_id;";
+$last_address_id=$db->getValue($sql);
+
                 $db->update('address',array(
                 
                     'alias'=>Tools::getValue('Name'),
                     'address1'=>Tools::getValue('address1'),
                     'city'=>Tools::getValue('City'),
                     'postcode'=>Tools::getValue('Zipcode')
-                ),'id_customer='.(int)$user_id).' other='.$name.'';
+                ),'id_address='.(int)$last_address_id).'';
 
             }
             else if($count==0) {

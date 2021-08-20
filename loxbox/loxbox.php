@@ -38,7 +38,10 @@ class Loxbox extends Module
         return parent::install()
 
             && $this->registerHook('displayCarrierList')
+            && $this->registerHook('actionCarrierUpdate')
             && $this->registerHook('actionValidateOrder')
+            && $this->registerHook('actionBeforeAjaxDieOrderOpcControllerinit')
+            
             && Configuration::updateValue('Loxbox', 'default-token')
             && $this->installDb();
 
@@ -52,6 +55,7 @@ class Loxbox extends Module
             && Configuration::deleteByName('Loxbox')
             && $this->uninstallDb();
     }
+
 
 
     public function uninstallDb()
@@ -70,10 +74,16 @@ class Loxbox extends Module
         $db->delete('carrier_shop','id_carrier = '.(int)$id.'');
         $db->delete('carrier_shop','id_carrier = '.(int)$id.'');
         $db->delete('carrier_zone','id_carrier = '.(int)$id.'');
-        return true;
+        return true; 
     }
 
 
+    // public function hookActionBeforeAjaxDieOrderOpcControllerinit($params)
+    // {
+    //     // If we're not using a Mondial Relay carrier...
+        
+    //     die(Tools::jsonEncode($this->context->cart->id_carrier));
+    // }
 
     public function getContent()
     {
@@ -112,7 +122,7 @@ class Loxbox extends Module
 
         $db->insert('carrier',array(
             'id_reference'=>(int)$totalCarriers+1,
-            'name'=>'loxbox',
+            'name'=>'Livraison point relais LOXBOX',
             'external_module_name'=>'Loxbox',
             'active'=>(int)1,
             'is_free'=>(int)0,
@@ -146,11 +156,19 @@ class Loxbox extends Module
             'id_carrier'=>(int)$totalCarriers+1,
             'id_shop'=>(int)1,
             'id_lang'=>(int)2,
-            'delay'=>"Livraison entre "
+            'delay'=>"Livraison entre 24/48 heures"
         ));
         $db->insert('carrier_zone',array(
             'id_carrier'=>(int)$totalCarriers+1,
             'id_zone'=>(int)4,
+        ));
+        $db->insert('carrier_zone',array(
+            'id_carrier'=>(int)$totalCarriers+1,
+            'id_zone'=>(int)1,
+        ));
+        $db->insert('carrier_zone',array(
+            'id_carrier'=>(int)$totalCarriers+1,
+            'id_zone'=>(int)2,
         ));
         $db->insert('carrier_group',array(
             'id_carrier'=>(int)$totalCarriers+1,
@@ -176,21 +194,29 @@ class Loxbox extends Module
 
     public function hookDisplayCarrierList() 
     {
-       
         ///get token from configuration
         $token = Configuration::get('Loxbox');
-
+        $id_carrier = $this->context->cart->id_carrier;
+        $db = Db::getInstance();
+        $query = "SELECT * FROM `ps_carrier` WHERE id_carrier=$id_carrier";
+        $carrier = $db->getRow($query);
+        $new_carrier = new Carrier();
+        // var_dump("test");
+        // die;
+        $new_carrier->hydrate($carrier);    
+        Media::addJsDef(array(
+            'isLoxbox' => $new_carrier->external_module_name=="Loxbox",
+            'Loxbox_TOKEN'=>$token
+        ));
         //test token
         $response =  get_web_page('https://www.loxbox.tn/api/Welcome/',$token);
         if($response==200)
         {
-            $this->context->controller->addJs(array(
-                'https://unpkg.com/leaflet@1.7.1/dist/leaflet.js'   
-                ));
+          
         
-            $this->context->controller->addJs(array(
-                $this->_path.'views/js/list.js'
-                ));
+            // $this->context->controller->addJs(array(
+            //     $this->_path.'views/js/list.js'
+            //     ));
             $this->context->controller->addJs(array(
                 $this->_path.'views/js/map_script.js'
             ));
@@ -212,25 +238,37 @@ class Loxbox extends Module
     ));
        return $this->display(__FILE__,'views/templates/hook/display_widget.tpl');
     }
+
    
    public function hookActionValidateOrder($params)
     {
         //the thing you want to do when the hook's executed goes here
-        $this->context->controller->addJs(array(
-            $this->_path.'views/js/alert.js'
-            ));
+     
             
             $carrier_id = $params['cart']->id_carrier;
+            $cart_id = $params['cart']->id;
+
             $db = Db::getInstance();
             $query = "SELECT * FROM `ps_carrier` WHERE id_carrier=$carrier_id";
+            $query2 = "SELECT * FROM `ps_cart` WHERE id_cart=$cart_id";
+            var_dump($query2);
             $carrier = $db->getRow($query);
+            $cart = $db->getRow($query2);
             $new_carrier = new Carrier();
+            $new_cart = new Cart();
             $new_carrier->hydrate($carrier);
+            $new_cart->hydrate($cart);
+            // $new_carrier->id_address_delivery = 44;
+            $new_cart->id_address_delivery = 8;
+            $new_cart->update();
+            var_dump($this->context->order);
+            var_dump($new_cart->id_address_delivery);
+            die;
            
-            if($new_carrier->external_module_name=="Loxbox")
-            {
-                // $query2 = ''
-                        }
+            // if($new_carrier->external_module_name=="Loxbox")
+            // {
+            //     // $query2 = ''
+            //             }
         
 
     }
