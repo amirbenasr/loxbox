@@ -20,7 +20,6 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore {
         $user_id = $this->context->cart->id_customer;
         if(Tools::getValue('ajax') && Tools::getValue("product_id"))
         {
-            
             $carrier_id = (int)Tools::getValue("product_id");
             $carrier = new Carrier();
             $db = Db::getInstance();

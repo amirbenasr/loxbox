@@ -41,6 +41,7 @@ class Loxbox extends Module
             && $this->registerHook('actionCarrierUpdate')
             && $this->registerHook('actionValidateOrder')
             && $this->registerHook('actionBeforeAjaxDieOrderOpcControllerinit')
+            && $this->registerHook('actionCarrierUpdate')
             
             && Configuration::updateValue('Loxbox', 'default-token')
             && $this->installDb();
@@ -194,6 +195,8 @@ class Loxbox extends Module
 
     public function hookDisplayCarrierList() 
     {
+        $controller = $this->context->controller->php_self;
+
         ///get token from configuration
         $token = Configuration::get('Loxbox');
         $id_carrier = $this->context->cart->id_carrier;
@@ -239,6 +242,8 @@ class Loxbox extends Module
        return $this->display(__FILE__,'views/templates/hook/display_widget.tpl');
     }
 
+    
+
    
    public function hookActionValidateOrder($params)
     {
@@ -247,24 +252,51 @@ class Loxbox extends Module
             
             $carrier_id = $params['cart']->id_carrier;
             $cart_id = $params['cart']->id;
+            $orderDetails = $params['order'];
 
+            ///if id carrier belongs to loxbox module
+            ///we update the order address_delivery to the latest
+            ///delivery of that customer within lopxboxmodule
             $db = Db::getInstance();
-            $query = "SELECT * FROM `ps_carrier` WHERE id_carrier=$carrier_id";
-            $query2 = "SELECT * FROM `ps_cart` WHERE id_cart=$cart_id";
-            var_dump($query2);
-            $carrier = $db->getRow($query);
-            $cart = $db->getRow($query2);
-            $new_carrier = new Carrier();
-            $new_cart = new Cart();
-            $new_carrier->hydrate($carrier);
-            $new_cart->hydrate($cart);
+
+            $query_1 = 'SELECT * FROM `'._DB_PREFIX_.'carrier` where `id_carrier`='.$orderDetails->id_carrier.';';
+            var_dump($query_1);
+            $carrier = $db->getRow($query_1);
+            $carrier_class = new Carrier();
+            $carrier_class->hydrate($carrier);
+
+
+            if($carrier_class->external_module_name=='Loxbox')
+            {
+                $sql = "SELECT MAX(id_address) FROM `ps_address` WHERE id_customer=".$orderDetails->id_customer.";";
+                $db->getValue($sql);
+             
+                $orderDetails->id_address_delivery=$db->getValue($sql);
+                $orderDetails->id_address_invoice=$db->getValue($sql);
+                $orderDetails->update();
+             
+
+            }
+
+          
+
+
+            // $query = "SELECT * FROM `ps_carrier` WHERE id_carrier=$carrier_id";
+            // $query2 = "SELECT * FROM `ps_cart` WHERE id_cart=$cart_id";
+            // var_dump($query2);
+            // $carrier = $db->getRow($query);
+            // $cart = $db->getRow($query2);
+            // $new_carrier = new Carrier();
+            // $new_cart = new Cart();
+            // $new_carrier->hydrate($carrier);
+            // $new_cart->hydrate($cart);
             // $new_carrier->id_address_delivery = 44;
-            $new_cart->id_address_delivery = 8;
-            $new_cart->update();
-            var_dump($this->context->order);
-            var_dump($new_cart->id_address_delivery);
-            die;
-           
+            // $new_cart->id_address_delivery = 8;
+            // $new_cart->update();
+            // var_dump($this->context->order);
+            // var_dump($new_cart->id_address_delivery);
+            // die;
+            
             // if($new_carrier->external_module_name=="Loxbox")
             // {
             //     // $query2 = ''

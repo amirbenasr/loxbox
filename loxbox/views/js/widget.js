@@ -35,8 +35,10 @@ $(document).ready(function () {
 
         if (carrier.external_module_name === "Loxbox") {
           parent.show();
+          SELECTED=false;
         } else {
           parent.hide();
+          SELECTED=true;
         }
       },
     });

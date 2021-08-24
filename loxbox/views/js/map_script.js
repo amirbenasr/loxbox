@@ -311,7 +311,15 @@ function getDiv(element) {
     element.WorkingHours[0].timing.forEach((day)=> {
       if(day.isClosed==0)
       {
-        html+= `<tr> <td> ${day.day} </td> <td> ${day.hours[0].open}</td> <td> ${day.hours[0].close}</td> </tr>`;
+        if(day.hours.size==1)
+        {
+          html+= `<tr> <td> ${day.day} </td> <td> ${day.hours[0].open}</td> <td> ${day.hours[0].close}</td> </tr>`;
+
+        }
+        else {
+        html+= `<tr> <td> ${day.day} </td> <td> ${day.hours[0].open} - ${day.hours[0].close} </td> <td>${day.hours[1].open} - ${day.hours[1].close} </td> </tr>`;
+
+        }
 
       }
       else {
