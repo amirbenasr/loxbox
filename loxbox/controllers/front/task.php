@@ -52,10 +52,10 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore {
             {
                 
 
-$sql = "SELECT MAX(id_address) from ps_address \n"
+                $sql = "SELECT MAX(id_address) from ps_address \n"
 
-. "where id_customer=$user_id;";
-$last_address_id=$db->getValue($sql);
+                . "where id_customer=$user_id;";
+                $last_address_id=$db->getValue($sql);
 
                 $db->update('address',array(
                 
@@ -81,7 +81,6 @@ $last_address_id=$db->getValue($sql);
                 $json = array(
                     'status' => 'error',
                     'name' => $name,
-
                     'alias'=>Tools::getValue('Name'),
                     'address1'=>Tools::getValue('address1'),
                     'user'=>$user,

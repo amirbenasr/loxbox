@@ -42,11 +42,12 @@ $(document).ready(function () {
       navigator.geolocation.getCurrentPosition(function (position) {
         location = position;
         console.log(position.coords);
-        // alert(location.coords);
-        // map.setView([position.coords.latitude, position.coords.longitude], 8);
+        map.setView([position.coords.latitude, position.coords.longitude], 10);
       });
     } else {
       div.innerHTML = "The Browser Does not Support Geolocation";
+      
+
     }
   }
   ///get client position
@@ -67,6 +68,11 @@ $(document).ready(function () {
       $("#myList > li").each(function () {
         $(this).show();
       });
+      $('.panel').each(function (index, element) {
+        // element == this
+        $(this).show();
+        
+      });
 
       return;
     } else {
@@ -78,6 +84,25 @@ $(document).ready(function () {
         } else {
           $(this).hide();
         }
+      });
+     
+      $(".panel").each(function (element) {
+     
+        var element = relays.find((element) => element.Name === this.title);
+        console.log(element);
+        if (element.City.toLowerCase() === city.toLowerCase()) {
+          $(this).show();
+        } else {
+          $(this).hide();
+        }
+        // alert(this.id);
+        // var element = relays.find((element) => element.Name === this.id);
+        // console.log(element);
+        // if (element.City.toLowerCase() === city.toLowerCase()) {
+        //   $(this).show();
+        // } else {
+        //   $(this).hide();
+        // }
       });
     }
   });
@@ -142,12 +167,13 @@ $(document).ready(function () {
           }
 
           var collapsable = `
-          <div class="panel panel-default">
+         
+          <div  class="panel panel-default" title="${element.Name}">
           <div class="panel-heading" role="tab" id="headingTwo">
             <h4 class="panel-title">
-              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#${
+              <a role="button"  data-toggle="collapse" data-parent="#myList" href="#${
                 element.Name
-              }" aria-expanded="false" aria-controls="collapseTwo">
+              }" aria-expanded="false" aria-controls="collapseTwo" value="${element.Name}">
               ${element.Name}
               </a>
             </h4>
@@ -159,7 +185,9 @@ $(document).ready(function () {
             ${getDiv(element)}
             </div>
           </div>
-        </div>`;
+        </div>
+    
+        `;
           ///inject relays to myList
           if ($(window).width() <= 768) {
             $("#myList").append(
@@ -195,8 +223,7 @@ $(document).ready(function () {
           var popup = L.popup({ autoPan: true })
             .setLatLng([element.latitude, element.Longitude])
             .setContent(`${getDiv(element)}`);
-         
-
+      
           L.marker([element.latitude, element.Longitude], {
             icon: L.icon({
               iconUrl:
@@ -210,6 +237,7 @@ $(document).ready(function () {
             }),
           })
             .addTo(map)
+   
             .bindPopup(popup)
             .on("click", function () {
               unselectAll();
@@ -226,6 +254,9 @@ $(document).ready(function () {
 
         });
         // alert(smallestDistance);
+        map.setView([chosenRelay.latitude, chosenRelay.Longitude], 10)
+        
+
         let cities = [];
 
         relays.forEach((e) => cities.push(e.City));
@@ -255,7 +286,7 @@ $(document).ready(function () {
             url: baseUri + "module/loxbox/task",
             data:
               "address1=" +
-              relay.Address +
+             relay.Name+','+ relay.Address +
               "&ajax=1" +
               "&City=" +
               relay.City +
@@ -279,14 +310,85 @@ $(document).ready(function () {
           map.panTo(map.unproject(px), { animate: true });
         });
 
-        ///set the map location to smallestDistance
-        map.setView([chosenRelay.latitude, chosenRelay.Longitude], 10);
 
-        //setting popup
-        var popup = L.popup()
-          .setLatLng([chosenRelay.latitude, chosenRelay.Longitude])
-          .setContent(`${getDiv(chosenRelay)}`)
-          .openOn(map);
+        ///mobile selection
+        // $(".collapsed").on("click", function (element) {
+        //   alert(element.target.id);
+        //   console.log(element.target.id);
+        //   // unselectAll();
+        //   SELECTED = true;
+        //   var relay = relays.find(
+        //     (_element) => _element.Name == element.target.id
+        //   );
+
+            
+          
+        //   // $(selector).text(textString);
+
+        //   //ajax call
+        //   $.ajax({
+        //     type: "POST",
+        //     url: baseUri + "module/loxbox/task",
+        //     data:
+        //       "address1=" +
+        //       relay.Address +
+        //       "&ajax=1" +
+        //       "&City=" +
+        //       relay.City +
+        //       "&Zipcode=" +
+        //       relay.Zipcode +
+        //       "&Name=" +
+        //       relay.Name,
+        //     success: function () {
+        //       console.log("sent success");
+        //     },
+        //   });
+         
+
+        // });
+        ///set the map location to smallestDistance
+      
+        $('.panel-heading a').click(function(element) {
+          // alert(element.target);
+          var url = element.target.toString().substring(element.target.toString().indexOf('#')+1,element.length);
+         url= url.replace('%C3%A9','é');
+
+          // alert(url.length);
+          const _relay = url;
+          SELECTED = true;
+          const relay = relays.find(
+            (_element) => _element.Name == _relay
+          );
+          // alert(relays[0].City)
+                     //ajax call
+          $.ajax({
+            type: "POST",
+            url: baseUri + "module/loxbox/task",
+            data:
+              "address1=" +
+             relay.Name +','+ relay.Address +
+              "&ajax=1" +
+              "&City=" +
+              relay.City +
+              "&Zipcode=" +
+              relay.Zipcode +
+              "&Name=" +
+              relay.Name,
+            success: function () {
+              console.log("sent success");
+            },
+          });
+
+          $('.panel-heading').removeClass('active');
+          //If the panel was open and would be closed by this click, do not active it
+          if(!$(this).closest('.panel').find('.panel-collapse').hasClass('in'))
+              $(this).parents('.panel-heading').addClass('active');
+          else{
+            SELECTED=false;
+          }
+         
+       });
+     
       },
     });
   }
@@ -334,7 +436,9 @@ function getDiv(element) {
   };
   return `<table class="table table-striped">
    <thead>
-   <h4>${chosenRelay.Name} <br> 
+   <h4>${chosenRelay.Name} </h4>
+   <h5>${chosenRelay.City+' '+chosenRelay.Zipcode}</h5> 
+   <h5>${chosenRelay.Address}</h5>
    <span><a style="font-style:italic;font-size:16;text-decoration:underline" href="${chosenRelay.MapLocation}" target="_blank">google location</a> </span>
    </h4>
    </thead>

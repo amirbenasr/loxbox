@@ -33,7 +33,7 @@ $(document).ready(function () {
         var body = JSON.parse(response);
         var carrier = body.message;
 
-        if (carrier.external_module_name === "Loxbox") {
+        if (carrier.external_module_name === "loxbox") {
           parent.show();
           SELECTED=false;
         } else {

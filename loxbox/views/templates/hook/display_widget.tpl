@@ -39,8 +39,8 @@
         <div class="list">
             <h2>Choisir le point relais le plus proche :</h2>
       <label class="col-sm-2" for="city">Ville :</label>
-      <div class="col-sm-6 col-md-4">
-        <select id="city" class="form-control">
+      <div class="col-sm-6 col-md-4 wrapper-customer">
+        <select id="city" class="custom-drop" >
         <option>Tous</option>
        
         </select> 
@@ -50,10 +50,9 @@
                
 
          <br>
+         <br>
             <br>
-            <button type="submit" class="btn pull-right" id="button" >
-              Search
-            </button>
+           
            
        
             <ul class="list-group" id="myList">

@@ -7,7 +7,7 @@ if (!defined('_PS_VERSION_')) {
 }
 
 
-class Loxbox extends Module
+class Loxbox extends CarrierModule
 {
 
     public function __construct()
@@ -32,59 +32,44 @@ class Loxbox extends Module
         }
     }
 
-    public function install(): bool
+    public function install()
     {
+        if (extension_loaded('curl') == false)
+        {
+            $this->_errors[] = $this->l('You have to enable the cURL extension on your server to install this module');
+            return false;
+        }
 
-        return parent::install()
+        $carrier = $this->addCarrier();
+        $this->addZones($carrier);
+        $this->addGroups($carrier);
+        $this->addRanges($carrier);
+        Configuration::updateValue('Loxbox', 'default-token');
+
+        include(dirname(__FILE__).'/sql/install.php');
+
+        return parent::install() &&
+        
+            $this->registerHook('header') &&
+            $this->registerHook('backOfficeHeader') &&
+            $this->registerHook('updateCarrier')
 
             && $this->registerHook('displayCarrierList')
             && $this->registerHook('actionCarrierUpdate')
             && $this->registerHook('actionValidateOrder')
             && $this->registerHook('actionBeforeAjaxDieOrderOpcControllerinit')
-            && $this->registerHook('actionCarrierUpdate')
-            
-            && Configuration::updateValue('Loxbox', 'default-token')
-            && $this->installDb();
-
-             
+            && $this->registerHook('actionCarrierUpdate');
     }
 
-  
-    public function uninstall(): bool
+    public function uninstall()
     {
-        return parent::uninstall()
-            && Configuration::deleteByName('Loxbox')
-            && $this->uninstallDb();
+        Configuration::deleteByName('Loxbox');
+
+        include(dirname(__FILE__).'/sql/uninstall.php');
+     
+        return parent::uninstall();
     }
-
-
-
-    public function uninstallDb()
-    {
-        $db = Db::getInstance();
-        $query ='SELECT (id_carrier) from ps_carrier where external_module_name="Loxbox"';
-        $id = $db->getValue($query);
-      
-
-       $db->delete('carrier', '`id_carrier` = '.(int)$id);
-
   
-        $db->delete('carrier_lang','id_carrier = '.(int)$id.'');
-        $db->delete('carrier_group','id_carrier = '.(int)$id.'');
-        $db->delete('carrier_lang','id_carrier = '.(int)$id.'');
-        $db->delete('carrier_shop','id_carrier = '.(int)$id.'');
-        $db->delete('carrier_shop','id_carrier = '.(int)$id.'');
-        $db->delete('carrier_zone','id_carrier = '.(int)$id.'');
-        return true; 
-    }
-
-
-    // public function hookActionBeforeAjaxDieOrderOpcControllerinit($params)
-    // {
-    //     // If we're not using a Mondial Relay carrier...
-        
-    //     die(Tools::jsonEncode($this->context->cart->id_carrier));
-    // }
 
     public function getContent()
     {
@@ -109,90 +94,6 @@ class Loxbox extends Module
     }
 
 
-    public function installDb() 
-    {
-
-
-        $db = Db::getInstance();
-        
-        // $sql = 'SELECT MAX(id_carrier) FROM '._DB_PREFIX_.'carrier';
-        $sql = "SELECT AUTO_INCREMENT - 1 as CurrentId FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '"._DB_NAME_."' AND TABLE_NAME = '"._DB_PREFIX_."carrier' ";
-       
-        $totalCarriers = Db::getInstance()->getValue($sql);
-        Configuration::set('PS_CARRIER_DEFAULT',$totalCarriers+1);
-
-        $db->insert('carrier',array(
-            'id_reference'=>(int)$totalCarriers+1,
-            'name'=>'Livraison point relais LOXBOX',
-            'external_module_name'=>'Loxbox',
-            'active'=>(int)1,
-            'is_free'=>(int)0,
-            'shipping_handling'=>(int)0,
-            
-            
-        ));
-
-        $db->insert('delivery',array(
-            'id_carrier'=>(int)$totalCarriers+1,
-            'id_shop'=>(int)1,
-            'price'=>4.000000,
-            'id_zone'=>(int)4,
-            'id_range_weight'=>(int)6            
-        ));
-
-        $db->insert('range_weight',array(
-            'id_carrier'=>(int)$totalCarriers+1,
-            'delimiter1'=>(int)0.000000,
-            'delimiter2'=>0.100000,
-                      
-        ));
-
-        $db->insert('carrier_lang',array(
-            'id_carrier'=>(int)$totalCarriers+1,
-            'id_shop'=>(int)1,
-            'id_lang'=>(int)1,
-            'delay'=>"Livraison entre 24/48 heures"
-        ));
-        $db->insert('carrier_lang',array(
-            'id_carrier'=>(int)$totalCarriers+1,
-            'id_shop'=>(int)1,
-            'id_lang'=>(int)2,
-            'delay'=>"Livraison entre 24/48 heures"
-        ));
-        $db->insert('carrier_zone',array(
-            'id_carrier'=>(int)$totalCarriers+1,
-            'id_zone'=>(int)4,
-        ));
-        $db->insert('carrier_zone',array(
-            'id_carrier'=>(int)$totalCarriers+1,
-            'id_zone'=>(int)1,
-        ));
-        $db->insert('carrier_zone',array(
-            'id_carrier'=>(int)$totalCarriers+1,
-            'id_zone'=>(int)2,
-        ));
-        $db->insert('carrier_group',array(
-            'id_carrier'=>(int)$totalCarriers+1,
-            'id_group'=>(int)1,
-        ));
-        $db->insert('carrier_group',array(
-            'id_carrier'=>(int)$totalCarriers+1,
-            'id_group'=>(int)2,
-        ));
-        $db->insert('carrier_group',array(
-            'id_carrier'=>(int)$totalCarriers+1,
-            'id_group'=>(int)3,
-        ));
-        $db->insert('carrier_shop',array(
-            'id_carrier'=>(int)$totalCarriers+1,
-            'id_shop'=>(int)1,
-        ));
-
-       copy(_PS_MODULE_DIR_.'loxbox/Logo-125.jpg', _PS_SHIP_IMG_DIR_ . ($totalCarriers+1) .'.jpg');
-   
-        return true;
-    }
-
     public function hookDisplayCarrierList() 
     {
         $controller = $this->context->controller->php_self;
@@ -204,11 +105,10 @@ class Loxbox extends Module
         $query = "SELECT * FROM `ps_carrier` WHERE id_carrier=$id_carrier";
         $carrier = $db->getRow($query);
         $new_carrier = new Carrier();
-        // var_dump("test");
-        // die;
+        
         $new_carrier->hydrate($carrier);    
         Media::addJsDef(array(
-            'isLoxbox' => $new_carrier->external_module_name=="Loxbox",
+            'isLoxbox' => $new_carrier->external_module_name=="loxbox",
             'Loxbox_TOKEN'=>$token
         ));
         //test token
@@ -242,7 +142,27 @@ class Loxbox extends Module
        return $this->display(__FILE__,'views/templates/hook/display_widget.tpl');
     }
 
-    
+        public function getOrderShippingCost($params, $shipping_cost)
+    {
+        if (Context::getContext()->customer->logged == true)
+        {
+            $id_address_delivery = Context::getContext()->cart->id_address_delivery;
+            $address = new Address($id_address_delivery);
+
+            /**
+             * Send the details through the API
+             * Return the price sent by the API
+             */
+            return 4;
+        }
+
+        return $shipping_cost;
+    }
+
+    public function getOrderShippingCostExternal($params)
+    {
+        return true;
+    }
 
    
    public function hookActionValidateOrder($params)
@@ -266,7 +186,7 @@ class Loxbox extends Module
             $carrier_class->hydrate($carrier);
 
 
-            if($carrier_class->external_module_name=='Loxbox')
+            if($carrier_class->external_module_name=='loxbox')
             {
                 $sql = "SELECT MAX(id_address) FROM `ps_address` WHERE id_customer=".$orderDetails->id_customer.";";
                 $db->getValue($sql);
@@ -278,31 +198,67 @@ class Loxbox extends Module
 
             }
 
-          
+   
 
+    }
+     protected function addCarrier()
+    {
+        $carrier = new Carrier();
 
-            // $query = "SELECT * FROM `ps_carrier` WHERE id_carrier=$carrier_id";
-            // $query2 = "SELECT * FROM `ps_cart` WHERE id_cart=$cart_id";
-            // var_dump($query2);
-            // $carrier = $db->getRow($query);
-            // $cart = $db->getRow($query2);
-            // $new_carrier = new Carrier();
-            // $new_cart = new Cart();
-            // $new_carrier->hydrate($carrier);
-            // $new_cart->hydrate($cart);
-            // $new_carrier->id_address_delivery = 44;
-            // $new_cart->id_address_delivery = 8;
-            // $new_cart->update();
-            // var_dump($this->context->order);
-            // var_dump($new_cart->id_address_delivery);
-            // die;
-            
-            // if($new_carrier->external_module_name=="Loxbox")
-            // {
-            //     // $query2 = ''
-            //             }
-        
+        $carrier->name = $this->l('Transporteur Loxbox');
+        $carrier->is_module = true;
+        $carrier->active = 1;
+        $carrier->range_behavior = 1;
+        $carrier->need_range = 1;
+        $carrier->shipping_external = true;
+        $carrier->range_behavior = 0;
+        $carrier->external_module_name = $this->name;
+        $carrier->shipping_method = 2;
 
+        foreach (Language::getLanguages() as $lang)
+            $carrier->delay[$lang['id_lang']] = $this->l('Super fast delivery');
+
+        if ($carrier->add() == true)
+        {
+            @copy(dirname(__FILE__).'/Logo-125.jpg', _PS_SHIP_IMG_DIR_.'/'.(int)$carrier->id.'.jpg');
+            Configuration::updateValue('MYSHIPPINGMODULE_CARRIER_ID', (int)$carrier->id);
+            return $carrier;
+        }
+
+        return false;
+    }
+
+    protected function addGroups($carrier)
+    {
+        $groups_ids = array();
+        $groups = Group::getGroups(Context::getContext()->language->id);
+        foreach ($groups as $group)
+            $groups_ids[] = $group['id_group'];
+
+        $carrier->setGroups($groups_ids);
+    }
+
+    protected function addRanges($carrier)
+    {
+        $range_price = new RangePrice();
+        $range_price->id_carrier = $carrier->id;
+        $range_price->delimiter1 = '0';
+        $range_price->delimiter2 = '10000';
+        $range_price->add();
+
+        $range_weight = new RangeWeight();
+        $range_weight->id_carrier = $carrier->id;
+        $range_weight->delimiter1 = '0';
+        $range_weight->delimiter2 = '10000';
+        $range_weight->add();
+    }
+
+    protected function addZones($carrier)
+    {
+        $zones = Zone::getZones();
+
+        foreach ($zones as $zone)
+            $carrier->addZone($zone['id_zone']);
     }
 
 }
