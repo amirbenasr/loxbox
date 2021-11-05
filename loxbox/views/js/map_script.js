@@ -2,7 +2,7 @@ var SELECTED = false;
 
 $(document).ready(function () {
 
-  alert("test");
+
   //unselect all active
   function unselectAll() {
     SELECTED = false;
