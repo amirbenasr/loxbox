@@ -7,7 +7,7 @@
   <p class="alert-text">
     Votre code "Token" a été vérifié avec succès - <a href="https://loxbox.tn" target="blank">https://loxbox.tn</a>.
   </p>
-</div>workinghourtest 
+</div> 
 <div class="alert alert-warning" role="alert" style="display:none">
   <p class="alert-text">
     Le module LoxBox n'est pas activé. Pour plus d'informations contacter : <a href="mailto:contact@loxbox.tn">contact@loxbox.tn</a>

@@ -91,7 +91,7 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore {
                     'other'=>$name,
                     'sql'=>$sql,
                     'postcode'=>Tools::getValue('Zipcode'),
-                    'token'=>Configuration::get('Loxbox')
+                    'token'=>Configuration::get('Loxbox'),
                 );
             }
             

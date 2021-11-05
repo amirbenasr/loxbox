@@ -52,7 +52,8 @@ class Loxbox extends CarrierModule
         
             $this->registerHook('header') &&
             $this->registerHook('backOfficeHeader') &&
-            $this->registerHook('updateCarrier')
+            $this->registerHook('updateCarrier') && 
+            $this->registerHook('updateExtraCarrier') 
 
             && $this->registerHook('displayCarrierList')
             && $this->registerHook('actionCarrierUpdate')
@@ -93,6 +94,12 @@ class Loxbox extends CarrierModule
         return $this->display(__FILE__,'views/templates/admin/loxbox_config.tpl');
     }
 
+    public function hookUpdateExtraCarrier()
+    {
+        echo "test";
+       return "waawa";
+
+    }
 
     public function hookDisplayCarrierList() 
     {
@@ -133,9 +140,7 @@ class Loxbox extends CarrierModule
             ));
 
         }
-        $this->context->controller->addJs(array(
-            $this->_path.'views/js/widget.js'
-        ));
+     
        $this->context->smarty->assign(array(
         'valid'=>$response
     ));
@@ -153,7 +158,7 @@ class Loxbox extends CarrierModule
              * Send the details through the API
              * Return the price sent by the API
              */
-            return 4;
+            return $address->price;
         }
 
         return $shipping_cost;
@@ -210,7 +215,7 @@ class Loxbox extends CarrierModule
         $carrier->active = 1;
         $carrier->range_behavior = 1;
         $carrier->need_range = 1;
-        $carrier->shipping_external = true;
+        $carrier->shipping_external = false;
         $carrier->range_behavior = 0;
         $carrier->external_module_name = $this->name;
         $carrier->shipping_method = 2;
@@ -257,8 +262,24 @@ class Loxbox extends CarrierModule
     {
         $zones = Zone::getZones();
 
+
         foreach ($zones as $zone)
             $carrier->addZone($zone['id_zone']);
+    }
+
+    protected function changePrice($carrier)
+    {
+        $price_list[] = array(
+            'id_range_price' => ($range_type == Carrier::SHIPPING_METHOD_PRICE ? (int)$range->id : null),
+            'id_range_weight' => ($range_type == Carrier::SHIPPING_METHOD_WEIGHT ? (int)$range->id : null),
+            'id_carrier' => (int)$carrier->id,
+            'id_zone' => (int)$id_zone,
+            'price' => 4,
+        );
+
+        $range_table = $carrier->getRangeTable();
+        $carrier->deleteDeliveryPrice($range_table);
+        $carrier->addDeliveryPrice($price_list);
     }
 
 }

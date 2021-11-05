@@ -1,35 +1,37 @@
+
+
 $(document).ready(function () {
   ///global
     if(isLoxbox==true)
     {
       $('.parent').show();
-    }
+    }   
     else {
       $('.parent').hide();
 
     }
-    
-    $(document).on("submit", "#form", function (e) {
-      return (
-        (SELECTED) ||
-        (e.preventDefault(),
-        e.stopPropagation(),
-        alert('Vous devez sélectionner un point relais'))
-      );
-    });
+
+    // $(document).on("submit", "#form", function (e) {
+    //   return (
+    //     (SELECTED) ||
+    //     (e.preventDefault(),
+    //     e.stopPropagation(),
+    //     alert('Vous devez sélectionner un point relais'))
+    //   );
+    // });
   var selectedI;
   $(".delivery_options").on("change", function () {
     var value = $('.delivery_option_radio:checked', "#form").val();
     selectedI = value.slice(0, -1);
     var parent = $(".parent");
     var relay = $('.relay-content');
-
     $.ajax({
       type: "POST",
       url: baseUri + "module/loxbox/task",
 
       data: "product_id=" + selectedI + "&ajax=1",
       success: function (response) {
+
         var body = JSON.parse(response);
         var carrier = body.message;
 

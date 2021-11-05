@@ -1,8 +1,8 @@
 var SELECTED = false;
 
 $(document).ready(function () {
-  console.log("test");
 
+  alert("test");
   //unselect all active
   function unselectAll() {
     SELECTED = false;
@@ -60,6 +60,7 @@ $(document).ready(function () {
   ///event handler for dropdown
 
   $("#city").change(function (e) {
+    map.invalidateSize();
     // e.preventDefault();
     var city = this.value;
     // console.log(this.attributes)

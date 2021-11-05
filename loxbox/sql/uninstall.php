@@ -31,6 +31,23 @@
  */
 $sql = array();
 
+$sql[] ="UPDATE `'"._DB_PREFIX_."'carrier` as `dest`,\n"
+
+. "(\n"
+
+. "    SELECT * FROM `'"._DB_PREFIX_."'carrier`\n"
+
+. "    WHERE `external_module_name`=\'loxbox\'\n"
+
+. "    ORDER BY `id_carrier` DESC LIMIT 1\n"
+
+. "    ) as `src`\n"
+
+. "    \n"
+
+. "SET `dest`.`deleted` = 1\n"
+
+. "WHERE `dest`.`id_carrier` = `src`.`id_carrier`;" ;
 foreach ($sql as $query) {
     if (Db::getInstance()->execute($query) == false) {
         return false;
