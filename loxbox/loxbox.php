@@ -1,11 +1,8 @@
 <?php
 
-
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
-
 
 class Loxbox extends CarrierModule
 {
@@ -34,8 +31,7 @@ class Loxbox extends CarrierModule
 
     public function install()
     {
-        if (extension_loaded('curl') == false)
-        {
+        if (extension_loaded('curl') == false) {
             $this->_errors[] = $this->l('You have to enable the cURL extension on your server to install this module');
             return false;
         }
@@ -46,62 +42,53 @@ class Loxbox extends CarrierModule
         $this->addRanges($carrier);
         Configuration::updateValue('Loxbox', 'default-token');
 
-        include(dirname(__FILE__).'/sql/install.php');
+        include dirname(__FILE__) . '/sql/install.php';
 
         return parent::install() &&
-        
-            $this->registerHook('header') &&
-            $this->registerHook('backOfficeHeader') &&
-            $this->registerHook('updateCarrier') && 
-            $this->registerHook('updateExtraCarrier') 
 
-            && $this->registerHook('displayCarrierList')
-            && $this->registerHook('actionCarrierUpdate')
-            && $this->registerHook('actionValidateOrder')
-            && $this->registerHook('actionBeforeAjaxDieOrderOpcControllerinit')
-            && $this->registerHook('actionCarrierUpdate');
+        $this->registerHook('header') &&
+        $this->registerHook('backOfficeHeader') &&
+        $this->registerHook('updateCarrier') &&
+        $this->registerHook('updateExtraCarrier')
+
+        && $this->registerHook('displayCarrierList')
+        && $this->registerHook('actionCarrierUpdate')
+        && $this->registerHook('actionValidateOrder')
+        && $this->registerHook('actionBeforeAjaxDieOrderOpcControllerinit')
+        && $this->registerHook('actionCarrierUpdate');
     }
 
     public function uninstall()
     {
         Configuration::deleteByName('Loxbox');
 
-        include(dirname(__FILE__).'/sql/uninstall.php');
-     
+        include dirname(__FILE__) . '/sql/uninstall.php';
+
         return parent::uninstall();
     }
-  
 
     public function getContent()
     {
         $this->context->controller->addCss(array(
-            $this->_path.'views/css/loxbox.css'
-         ));
-         $this->context->controller->addJs(array(
-             $this->_path.'views/js/loxbox.js'
-         ));
-         
-        if(Tools::isSubmit('saveToken'))
-        {   
+            $this->_path . 'views/css/loxbox.css',
+        ));
+        $this->context->controller->addJs(array(
+            $this->_path . 'views/js/loxbox.js',
+        ));
+
+        if (Tools::isSubmit('saveToken')) {
+
             $token = Tools::getValue('ltoken');
-            Configuration::updateValue('Loxbox',$token);
-         
+            Configuration::updateValue('Loxbox', $token);
         }
         $this->context->smarty->assign(array(
-            'LoxboxToken' => Configuration::get('Loxbox')
+            'LoxboxToken' => Configuration::get('Loxbox'),
 
         ));
-        return $this->display(__FILE__,'views/templates/admin/loxbox_config.tpl');
+        return $this->display(__FILE__, 'views/templates/admin/loxbox_config.tpl')  ;
     }
 
-    public function hookUpdateExtraCarrier()
-    {
-        echo "test";
-       return "waawa";
-
-    }
-
-    public function hookDisplayCarrierList() 
+    public function hookDisplayCarrierList()
     {
         $controller = $this->context->controller->php_self;
 
@@ -109,48 +96,40 @@ class Loxbox extends CarrierModule
         $token = Configuration::get('Loxbox');
         $id_carrier = $this->context->cart->id_carrier;
         $db = Db::getInstance();
-        $query = "SELECT * FROM `ps_carrier` WHERE id_carrier=$id_carrier";
+        $query = 'SELECT * FROM `' . _DB_PREFIX_ . 'carrier` WHERE id_carrier=' . $id_carrier;
         $carrier = $db->getRow($query);
         $new_carrier = new Carrier();
-        
-        $new_carrier->hydrate($carrier);    
+
+        $new_carrier->hydrate($carrier);
         Media::addJsDef(array(
-            'isLoxbox' => $new_carrier->external_module_name=="loxbox",
-            'Loxbox_TOKEN'=>$token
+            'isLoxbox' => $new_carrier->external_module_name == "loxbox" ? true : false,
+            'Loxbox_TOKEN' => $token,
         ));
         //test token
-        $response =  get_web_page('https://www.loxbox.tn/api/Welcome/',$token);
-        if($response==200)
-        {
-          
-        
-            // $this->context->controller->addJs(array(
-            //     $this->_path.'views/js/list.js'
-            //     ));
-            $this->context->controller->addJs(array(
-                $this->_path.'views/js/map_script.js'
-            ));
-            
-           
-            $this->context->controller->addJs(array(
-                $this->_path.'views/js/widget.js'
-            ));
+        $response = get_web_page('https://www.loxbox.tn/api/Welcome/', $token);
+        if ($response == 200) {
             $this->context->controller->addCss(array(
-                $this->_path.'views/css/style.css'
+                $this->_path . 'views/css/style.css',
             ));
 
+            $this->context->controller->addJs(array(
+                $this->_path . 'views/js/widget.js',
+            ));
         }
-     
-       $this->context->smarty->assign(array(
-        'valid'=>$response
-    ));
-       return $this->display(__FILE__,'views/templates/hook/display_widget.tpl');
+
+        $this->context->smarty->assign(array(
+            'valid' => $response,
+            'js_inclusion_template' => _PS_ALL_THEMES_DIR_ . 'javascript.tpl',
+            'fromAjax' => $this->context->controller->ajax,
+            'isLoxbox' => $new_carrier->external_module_name == "loxbox" ? true : false,
+
+        ));
+        return $this->display(__FILE__, 'views/templates/hook/new_widget.tpl');
     }
 
-        public function getOrderShippingCost($params, $shipping_cost)
+    public function getOrderShippingCost($params, $shipping_cost)
     {
-        if (Context::getContext()->customer->logged == true)
-        {
+        if (Context::getContext()->customer->logged == true) {
             $id_address_delivery = Context::getContext()->cart->id_address_delivery;
             $address = new Address($id_address_delivery);
 
@@ -169,44 +148,35 @@ class Loxbox extends CarrierModule
         return true;
     }
 
-   
-   public function hookActionValidateOrder($params)
+    public function hookActionValidateOrder($params)
     {
         //the thing you want to do when the hook's executed goes here
-     
-            
-            $carrier_id = $params['cart']->id_carrier;
-            $cart_id = $params['cart']->id;
-            $orderDetails = $params['order'];
 
-            ///if id carrier belongs to loxbox module
-            ///we update the order address_delivery to the latest
-            ///delivery of that customer within lopxboxmodule
-            $db = Db::getInstance();
+        $carrier_id = $params['cart']->id_carrier;
+        $cart_id = $params['cart']->id;
+        $orderDetails = $params['order'];
 
-            $query_1 = 'SELECT * FROM `'._DB_PREFIX_.'carrier` where `id_carrier`='.$orderDetails->id_carrier.';';
-            var_dump($query_1);
-            $carrier = $db->getRow($query_1);
-            $carrier_class = new Carrier();
-            $carrier_class->hydrate($carrier);
+        ///if id carrier belongs to loxbox module
+        ///we update the order address_delivery to the latest
+        ///delivery of that customer within lopxboxmodule
+        $db = Db::getInstance();
 
+        $query_1 = 'SELECT * FROM `' . _DB_PREFIX_ . 'carrier` where `id_carrier`=' . $orderDetails->id_carrier . ';';
+        var_dump($query_1);
+        $carrier = $db->getRow($query_1);
+        $carrier_class = new Carrier();
+        $carrier_class->hydrate($carrier);
 
-            if($carrier_class->external_module_name=='loxbox')
-            {
-                $sql = "SELECT MAX(id_address) FROM `ps_address` WHERE id_customer=".$orderDetails->id_customer.";";
-                $db->getValue($sql);
-             
-                $orderDetails->id_address_delivery=$db->getValue($sql);
-                $orderDetails->id_address_invoice=$db->getValue($sql);
-                $orderDetails->update();
-             
+        if ($carrier_class->external_module_name == 'loxbox') {
+            $sql = 'SELECT MAX(id_address) FROM `' . _DB_PREFIX_ . 'address` WHERE id_customer=' . $orderDetails->id_customer;
+            $db->getValue($sql);
 
-            }
-
-   
-
+            $orderDetails->id_address_delivery = $db->getValue($sql);
+            $orderDetails->id_address_invoice = $db->getValue($sql);
+            $orderDetails->update();
+        }
     }
-     protected function addCarrier()
+    public function addCarrier()
     {
         $carrier = new Carrier();
 
@@ -220,12 +190,12 @@ class Loxbox extends CarrierModule
         $carrier->external_module_name = $this->name;
         $carrier->shipping_method = 2;
 
-        foreach (Language::getLanguages() as $lang)
+        foreach (Language::getLanguages() as $lang) {
             $carrier->delay[$lang['id_lang']] = $this->l('Super fast delivery');
+        }
 
-        if ($carrier->add() == true)
-        {
-            @copy(dirname(__FILE__).'/Logo-125.jpg', _PS_SHIP_IMG_DIR_.'/'.(int)$carrier->id.'.jpg');
+        if ($carrier->add() == true) {
+            @copy(dirname(__FILE__) . '/Logo-125.jpg', _PS_SHIP_IMG_DIR_ . '/' . (int)$carrier->id . '.jpg');
             Configuration::updateValue('MYSHIPPINGMODULE_CARRIER_ID', (int)$carrier->id);
             return $carrier;
         }
@@ -233,17 +203,18 @@ class Loxbox extends CarrierModule
         return false;
     }
 
-    protected function addGroups($carrier)
+    public function addGroups($carrier)
     {
         $groups_ids = array();
         $groups = Group::getGroups(Context::getContext()->language->id);
-        foreach ($groups as $group)
+        foreach ($groups as $group) {
             $groups_ids[] = $group['id_group'];
+        }
 
         $carrier->setGroups($groups_ids);
     }
 
-    protected function addRanges($carrier)
+    public function addRanges($carrier)
     {
         $range_price = new RangePrice();
         $range_price->id_carrier = $carrier->id;
@@ -258,16 +229,17 @@ class Loxbox extends CarrierModule
         $range_weight->add();
     }
 
-    protected function addZones($carrier)
+    public function addZones($carrier)
     {
         $zones = Zone::getZones();
 
-
-        foreach ($zones as $zone)
+        foreach ($zones as $zone) {
             $carrier->addZone($zone['id_zone']);
+        }
+
     }
 
-    protected function changePrice($carrier)
+    public function changePrice($carrier)
     {
         $price_list[] = array(
             'id_range_price' => ($range_type == Carrier::SHIPPING_METHOD_PRICE ? (int)$range->id : null),
@@ -281,43 +253,40 @@ class Loxbox extends CarrierModule
         $carrier->deleteDeliveryPrice($range_table);
         $carrier->addDeliveryPrice($price_list);
     }
-
 }
 
-function get_web_page( $url,$token )
+function get_web_page($url, $token)
 {
     $options = array(
-        CURLOPT_RETURNTRANSFER => true,     // return web page
-        CURLOPT_HEADER         => false,    // don't return headers
-        CURLOPT_FOLLOWLOCATION => false,     // follow redirects
-        CURLOPT_HTTPHEADER => ['Authorization: Token '.$token],
-        CURLOPT_POST=>false,
-        CURLOPT_ENCODING       => "",       // handle all encodings
-        CURLOPT_USERAGENT      => "spider", // who am i
-        CURLOPT_AUTOREFERER    => true,     // set referer on redirect
-        CURLOPT_CONNECTTIMEOUT => 120,      // timeout on connect
-        CURLOPT_TIMEOUT        => 120,      // timeout on response
-        CURLOPT_MAXREDIRS      => 10,       // stop after 10 redirects
-        CURLOPT_SSL_VERIFYPEER => false,     // Disabled SSL Cert checks
+        CURLOPT_RETURNTRANSFER => true, // return web page
+        CURLOPT_HEADER => false, // don't return headers
+        CURLOPT_FOLLOWLOCATION => false, // follow redirects
+        CURLOPT_HTTPHEADER => ['Authorization: Token ' . $token],
+        CURLOPT_POST => false,
+        CURLOPT_ENCODING => "", // handle all encodings
+        CURLOPT_USERAGENT => "spider", // who am i
+        CURLOPT_AUTOREFERER => true, // set referer on redirect
+        CURLOPT_CONNECTTIMEOUT => 120, // timeout on connect
+        CURLOPT_TIMEOUT => 120, // timeout on response
+        CURLOPT_MAXREDIRS => 10, // stop after 10 redirects
+        CURLOPT_SSL_VERIFYPEER => false, // Disabled SSL Cert checks
     );
 
-    $ch      = curl_init( $url );
-    curl_setopt_array( $ch, $options );
-    $content = curl_exec( $ch );
-    $err     = curl_errno( $ch );
-    $errmsg  = curl_error( $ch );
-    $header  = curl_getinfo( $ch );
+    $ch = curl_init($url);
+    curl_setopt_array($ch, $options);
+    $content = curl_exec($ch);
+    $err = curl_errno($ch);
+    $errmsg = curl_error($ch);
+    $header = curl_getinfo($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    
-    curl_close( $ch );
 
-    $header['errno']   = $err;
-    $header['errmsg']  = $errmsg;
+    curl_close($ch);
+
+    $header['errno'] = $err;
+    $header['errmsg'] = $errmsg;
     $header['content'] = $content;
-   
-     
+
     $response = $http_code;
 
     return $response;
 }
-

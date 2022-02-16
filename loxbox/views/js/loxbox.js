@@ -1,4 +1,4 @@
-$(document).ready(function () {
+$(document).on('ready',function () {
   var token = $("#_ltoken").val();
 
   $.ajax({
@@ -29,7 +29,6 @@ $(document).ready(function () {
     document.getElementById("#saveToken").submit();
   });
 
-  ///welcome api if it's success add welcome message
 
   
   

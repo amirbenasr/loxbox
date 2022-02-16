@@ -1,24 +1,28 @@
-var SELECTED = false;
 
-$(document).ready(function () {
+$(document).on('ready loadMap','.loxbox-widget',function () {
 
+  var container = L.DomUtil.get('map');
+      if(container != null){
 
-  //unselect all active
-  function unselectAll() {
-    SELECTED = false;
-    $("#selected-relay-valid").hide();
-    $("li").each(function (index) {
-      $(this).removeClass("active");
-    });
-  }
-
-  ///loading map
+        container._leaflet_id = null;
+      }
   var map = L.map("map", {
     center: [0, 0],
     zoom: 13,
   }).on("click", function () {
     unselectAll();
   });
+  //unselect all active
+  function unselectAll() {
+    SELECTED = false;
+    $("#selected-relay-valid").hide();
+    $("li").each(function (index) {
+      $(this).removeClass("loxbox-active");
+    });
+  }
+
+  ///loading map
+ 
 
   //setting preconfigured popup
   map.on("popupopen", function (e) {
@@ -60,7 +64,7 @@ $(document).ready(function () {
   ///event handler for dropdown
 
   $("#city").change(function (e) {
-    map.invalidateSize();
+    // map.invalidateSize();
     // e.preventDefault();
     var city = this.value;
     // console.log(this.attributes)
@@ -246,7 +250,7 @@ $(document).ready(function () {
               $("li").each(function () {
                 // console.log($(this)[0].id);
                 if ($(this)[0].id == element.Name) {
-                  $(this).addClass("active");
+                  $(this).addClass("loxbox-active");
                   $('#selectedRelay').text(element.Name);
                   SELECTED = true;
                 }
@@ -305,7 +309,7 @@ $(document).ready(function () {
             .openOn(map);
           // map.panTo([relay.latitude, relay.Longitude]);
 
-          $(this).addClass("active");
+          $(this).addClass("loxbox-active");
           var px = map.project(element.target._popup._latlng); // find the pixel location on the map where the popup anchor is
           px.y -= element.target._popup._container.clientHeight / 2; // find the height of the popup container, divide by 2, subtract from the Y axis of marker location
           map.panTo(map.unproject(px), { animate: true });
@@ -380,10 +384,10 @@ $(document).ready(function () {
             },
           });
 
-          $('.panel-heading').removeClass('active');
+          $('.panel-heading').removeClass('loxbox-active');
           //If the panel was open and would be closed by this click, do not active it
           if(!$(this).closest('.panel').find('.panel-collapse').hasClass('in'))
-              $(this).parents('.panel-heading').addClass('active');
+              $(this).parents('.panel-heading').addClass('loxbox-active');
           else{
             SELECTED=false;
           }
