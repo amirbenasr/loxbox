@@ -22,7 +22,6 @@ class AdminLoxboxController extends ModuleAdminController
     {
         parent::setMedia($isNewTheme);
 
-        $this->addJqueryUI('ui.progressbar');
 
         $this->addJs(_MODULE_DIR_ . $this->module->name . '/views/js/loxbox_back.js');
         $link = new Link;
