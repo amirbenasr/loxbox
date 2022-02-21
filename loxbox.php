@@ -6,6 +6,14 @@ if (!defined('_PS_VERSION_')) {
 
 class Loxbox extends CarrierModule
 {
+    public $tabs = [
+        [
+            'name' => 'Merchant Expertise', // One name for all langs
+            'class_name' => 'AdminGamification',
+            'visible' => true,
+            'parent_class_name' => 'ShopParameters',
+        ],
+    ];
 
     public function __construct()
     {
@@ -45,9 +53,11 @@ class Loxbox extends CarrierModule
         include dirname(__FILE__) . '/sql/install.php';
 
         return parent::install() &&
+        $this->installTab() &&
 
         $this->registerHook('header') &&
         $this->registerHook('backOfficeHeader') &&
+         $this->registerHook('displayBackOfficeHeader') &&
         $this->registerHook('updateCarrier') &&
         $this->registerHook('displayCarrierExtraContent') &&
         $this->registerHook('updateExtraCarrier') 
@@ -57,13 +67,55 @@ class Loxbox extends CarrierModule
         && $this->registerHook('actionCarrierUpdate');
     }
 
+    
     public function uninstall()
     {
         Configuration::deleteByName('Loxbox');
 
         include dirname(__FILE__) . '/sql/uninstall.php';
 
-        return parent::uninstall();
+        return parent::uninstall() && $this->uninstallTab();
+    }
+
+    public function installTab()
+    {
+        $tab = new Tab();
+        $tab->active = true;
+        $tab->class_name = 'AdminLoxbox';
+        $tab->name = [];
+        foreach (Language::getLanguages(true) as $lang) {
+            $tab->name[$lang['id_lang']] = 'Loxbox';
+        }
+
+        if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
+            //AdminPreferences
+            $tab->id_parent = (int) Db::getInstance((bool) _PS_USE_SQL_SLAVE_)
+                ->getValue(
+                    'SELECT MIN(id_tab)
+                        FROM `' . _DB_PREFIX_ . 'tab`
+                        WHERE `class_name` = "' . pSQL('AdminParentShipping') . '"'
+                );
+        } else {
+            // AdminAdmin
+            $tab->id_parent = (int) Tab::getIdFromClassName('AdminAdmin');
+            $tab->icon = 'local_shipping';
+        }
+
+        $tab->module = $this->name;
+
+        return $tab->add();
+    }
+
+    public function uninstallTab()
+    {
+        $id_tab = (int) Tab::getIdFromClassName('AdminLoxbox');
+        if ($id_tab) {
+            $tab = new Tab($id_tab);
+
+            return $tab->delete();
+        }
+
+        return false;
     }
 
     public function getContent()
@@ -87,9 +139,21 @@ class Loxbox extends CarrierModule
         return $this->display(__FILE__, 'views/templates/admin/loxbox_config.tpl')  ;
     }
 
+    public function hookDisplayBackOfficeHeader()
+    {
+       
+
+        return '<script>
+            var admin_loxbox_link = ' . (string) json_encode(
+            $this->context->link->getAdminLink('AdminLoxbox')
+        ) . ';
+            var current_id_tab = ' . (int) $this->context->controller->id . ';
+        </script>';
+    }
 
 public function hookHeader($params)
 {
+ 
     // Only on product page
     if ('order' === $this->context->controller->php_self) {
         $token = Configuration::get('Loxbox');
