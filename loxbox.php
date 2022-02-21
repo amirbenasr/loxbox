@@ -55,6 +55,7 @@ class Loxbox extends CarrierModule
         return parent::install() &&
         $this->installTab() &&
         $this->installTab2() &&
+        $this->installTab3() &&
 
         $this->registerHook('header') &&
         $this->registerHook('backOfficeHeader') &&
@@ -110,10 +111,10 @@ class Loxbox extends CarrierModule
     {
         $tab = new Tab();
         $tab->active = true;
-        $tab->class_name = 'AdminLoxboxCarriersSettings';
+        $tab->class_name = 'AdminLoxboxParametres';
         $tab->name = [];
         foreach (Language::getLanguages(true) as $lang) {
-            $tab->name[$lang['id_lang']] = 'Loxbox';
+            $tab->name[$lang['id_lang']] = 'Paramètres';
         }
 
         if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
@@ -133,13 +134,45 @@ class Loxbox extends CarrierModule
 
         return $tab->add();
     }
+
+    public function  installTab3()
+    {
+        $tab = new Tab();
+        $tab->active = true;
+        $tab->class_name = 'AdminLoxboxExpedition';
+        $tab->name = [];
+        foreach (Language::getLanguages(true) as $lang) {
+            $tab->name[$lang['id_lang']] = 'Expédition';
+        }
+
+        if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
+            //AdminPreferences
+            $tab->id_parent = (int) Db::getInstance((bool) _PS_USE_SQL_SLAVE_)
+                ->getValue(
+                    'SELECT MIN(id_tab)
+                        FROM `' . _DB_PREFIX_ . 'tab`
+                        WHERE `class_name` = "' . pSQL('AdminLoxbox') . '"'
+                );
+        } else {
+            // AdminAdmin
+            $tab->id_parent = (int) Tab::getIdFromClassName('AdminAdmin');
+        }
+        $tab->module = $this->name;
+        $tab->position = 3;
+
+        return $tab->add();
+    }
     public function uninstallTab()
     {
         $id_tab = (int) Tab::getIdFromClassName('AdminLoxbox');
+        $id_tab2 = (int) Tab::getIdFromClassName('AdminLoxboxParametres');
+        $id_tab3 = (int) Tab::getIdFromClassName('AdminLoxboxExpedition');
         if ($id_tab) {
             $tab = new Tab($id_tab);
+            $tab2 = new Tab($id_tab2);
+            $tab3 = new Tab($id_tab3);
 
-            return $tab->delete();
+            return $tab->delete() && $tab2->delete() && $tab3->delete() ;
         }
 
         return false;
