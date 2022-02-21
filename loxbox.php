@@ -93,14 +93,13 @@ class Loxbox extends CarrierModule
                 ->getValue(
                     'SELECT MIN(id_tab)
                         FROM `' . _DB_PREFIX_ . 'tab`
-                        WHERE `class_name` = "' . pSQL('AdminParentShipping') . '"'
+                        WHERE `class_name` = "' . pSQL('SELL') . '"'
                 );
         } else {
             // AdminAdmin
             $tab->id_parent = (int) Tab::getIdFromClassName('AdminAdmin');
-            $tab->icon = 'local_shipping';
         }
-
+        $tab->icon = 'local_shipping';
         $tab->module = $this->name;
 
         return $tab->add();
@@ -156,6 +155,7 @@ public function hookHeader($params)
  
     // Only on product page
     if ('order' === $this->context->controller->php_self) {
+        
         $token = Configuration::get('Loxbox');
         $id_carrier = $this->context->cart->id_carrier;
         $db = Db::getInstance();

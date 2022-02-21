@@ -8,13 +8,14 @@
 {/literal}
 
     <div class="loxbox-widget">
-        {if $isLoxbox &&  {$valid}==200 }
+        {if  {$valid}==200 }
 
             <div class="relay-content">
             </div>
             {literal}
 
                 <script>
+                var map;
                     var SELECTED = false;
 
                     function loadHtml() {
@@ -23,7 +24,7 @@
                      <div class="results">
                        <div class="list">
                            <h2>Choisir le point relais le plus proche :</h2>
-                     <label class="col-sm-2" for="city">Ville :</label>
+                     <label class="col-sm-2" for="city">Ville:</label>
                      <div class="col-sm-6 col-md-4 wrapper-customer">
                        <select id="city" class="custom-drop" >
                        <option>Tous</option>   
@@ -52,7 +53,7 @@
                     }
 
                     function loadMap() {
-                        var map = L.map("map", {
+                         map = L.map("map", {
                                 zoom: 10,
                             })
                             .on("click", function() {
@@ -71,7 +72,6 @@
                         attribution:
                             '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
                     }).addTo(map);
-
                     //we need map instance to create markups
                     fetchData(map, L);
                     }
@@ -79,6 +79,7 @@
                     function loadPlugin(L) {
                         loadHtml();
                         loadMap(L);
+
                     }
 
                     function hidePlugin() {
@@ -364,7 +365,6 @@ ${html}
                                     "&Name=" +
                                     relay.Name,
                                 success: function() {
-                                    console.log("test");
                                 },
                             });
                             showItemOnMap(relay, map, L);
@@ -391,6 +391,7 @@ ${html}
                             if ($(this)[0].id == element.Name) {
                                 $(this).addClass("active");
                                 $("#selectedRelay").text(element.Name);
+                                SELECTED=true;
                             }
                         });
                     }
@@ -416,13 +417,14 @@ ${html}
                         setLoader();
                         loadHtml();
                         loadMap(L);
+
                         removeLoader();
                     }
                 </script>
 
 
             {/literal}
-        {elseif {$valid}!=200 && {$isLoxbox}}
+        {elseif {$valid}!=200 }
             {literal}
                 <script>
                     SELECTED = true;

@@ -5,12 +5,24 @@ $(document).on('ready',function () {
     if(isLoxbox==true)
     {
       $('.loxbox-widget').show();
+      SELECTED=false;
+    
     }   
+    
     else {
       $('.loxbox-widget').hide();
       SELECTED=true;
 
     }
+
+
+   $('.step-title').click(function(e) { 
+    if(typeof map !=='undefined')
+    {
+      setTimeout(function(){ map.invalidateSize()}, 1000);
+    }
+     
+   });
 
     //handles the continue button of chose delivery step
     //and stop propagation
@@ -35,7 +47,7 @@ $(document).on('ready',function () {
   $(".delivery-options").on("change", function () {
     var value = $("input[name^='delivery_option']:checked").val();
     selectedI = value.slice(0, -1);
-
+    
     $.ajax({
       type: "POST",
       url: "http://localhost/prestashop/en/module/loxbox/task",
@@ -49,13 +61,21 @@ $(document).on('ready',function () {
 
         if (carrier.external_module_name === "loxbox") {
           isLoxbox=true;
-      $('.loxbox-widget').show();
+          $('.loxbox-widget').show();
+          SELECTED=false;
+          if(typeof map !== 'undefined')
+          {
+            setTimeout(function(){ map.invalidateSize()}, 1000);
+
+          }
+
 
           // $('.loxbox_container').show();
         } else {
 
           
           // $('.loxbox_container').hide();
+          SELECTED=true;
 
           isLoxbox=false;
         }
