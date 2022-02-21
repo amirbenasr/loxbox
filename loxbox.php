@@ -54,6 +54,7 @@ class Loxbox extends CarrierModule
 
         return parent::install() &&
         $this->installTab() &&
+        $this->installTab2() &&
 
         $this->registerHook('header') &&
         $this->registerHook('backOfficeHeader') &&
@@ -105,6 +106,33 @@ class Loxbox extends CarrierModule
         return $tab->add();
     }
 
+  public function  installTab2()
+    {
+        $tab = new Tab();
+        $tab->active = true;
+        $tab->class_name = 'AdminLoxboxCarriersSettings';
+        $tab->name = [];
+        foreach (Language::getLanguages(true) as $lang) {
+            $tab->name[$lang['id_lang']] = 'Loxbox';
+        }
+
+        if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
+            //AdminPreferences
+            $tab->id_parent = (int) Db::getInstance((bool) _PS_USE_SQL_SLAVE_)
+                ->getValue(
+                    'SELECT MIN(id_tab)
+                        FROM `' . _DB_PREFIX_ . 'tab`
+                        WHERE `class_name` = "' . pSQL('AdminLoxbox') . '"'
+                );
+        } else {
+            // AdminAdmin
+            $tab->id_parent = (int) Tab::getIdFromClassName('AdminAdmin');
+        }
+        $tab->module = $this->name;
+        $tab->position = 2;
+
+        return $tab->add();
+    }
     public function uninstallTab()
     {
         $id_tab = (int) Tab::getIdFromClassName('AdminLoxbox');
