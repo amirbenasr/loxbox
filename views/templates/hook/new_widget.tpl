@@ -65,7 +65,8 @@
                                     ._latlng); // find the pixel location on the map where the popup anchor is
                                 px.y -= e.target._popup._container.clientHeight /
                                     2; // find the height of the popup container, divide by 2, subtract from the Y axis of marker location
-                                map.panTo(map.unproject(px), { animate: true }); // pan to new center
+                                map.panTo(map.unproject(px), { animate: true });
+                              
                             });
                         //loading tile layer
                         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -244,7 +245,6 @@ ${html}
                                         iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-gold.png",
                                         shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
                                         iconSize: [25, 41],
-
                                         shadowSize: [41, 41],
                                     }),
                                 })

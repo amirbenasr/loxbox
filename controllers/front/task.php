@@ -18,7 +18,7 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore
     public function initContent()
     {
         parent::initContent();
-       
+       $json ;
         $user_id = $this->context->cart->id_customer;
         if (Tools::getValue('ajax') && Tools::getValue("product_id")) {
             $carrier_id = (int)Tools::getValue("product_id");
@@ -60,6 +60,7 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore
                     'city' => Tools::getValue('City'),
                     'postcode' => Tools::getValue('Zipcode'),
                 ), 'id_address=' . (int)$last_address_id) . '';
+                $json = array('update'=>'success');
 
             } elseif ($count == 0) {
                 $db->insert('address', array(

@@ -31,6 +31,8 @@ class AdminLoxboxParametresController extends ModuleAdminController
         parent::setMedia($isNewTheme);
 
         $this->addJs(_MODULE_DIR_ . $this->module->name . '/views/js/loxbox.js');
+        $this->addCss(_MODULE_DIR_ . $this->module->name . '/views/css/parametres.css');
+
         $this->addCss(_MODULE_DIR_ . $this->module->name . '/views/css/loxbox.css');
 
 
