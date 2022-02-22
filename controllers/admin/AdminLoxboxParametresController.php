@@ -10,6 +10,7 @@ class AdminLoxboxParametresController extends ModuleAdminController
     {
         $this->bootstrap = true;
         $this->display = 'view';
+        $this->toolbar_title[] = 'Paramètres';
         parent::__construct();
         $this->meta_title = $this->l('Paramètres');
         if (!$this->module->active) {
@@ -54,6 +55,5 @@ class AdminLoxboxParametresController extends ModuleAdminController
 
         return parent::init();
     }
-
 
 }

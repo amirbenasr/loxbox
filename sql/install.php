@@ -25,10 +25,17 @@
  */
 $sql = array();
 
-$sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'loxbox` (
-    `id_loxbox` int(11) NOT NULL AUTO_INCREMENT,
-    PRIMARY KEY  (`id_loxbox`)
-) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
+$sql[] = "CREATE TABLE `"._DB_PREFIX_."loxbox_carrier` (
+    `id_loxbox_carrier` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    `id_carrier` int(10) unsigned NOT NULL,
+    `delivery_mode` enum('24R','DRI','LD1','LDS','HOM') NOT NULL,
+    `is_deleted` tinyint(1) unsigned NOT NULL DEFAULT '0',
+    `id_reference` int(10) unsigned NOT NULL,
+    `date_add` datetime NOT NULL,
+    `date_upd` datetime NOT NULL,
+    PRIMARY KEY (`id_loxbox_carrier`)
+  ) ENGINE= ". _MYSQL_ENGINE_ ." DEFAULT CHARSET=utf8";
+
 
 foreach ($sql as $query) {
     if (Db::getInstance()->execute($query) == false) {

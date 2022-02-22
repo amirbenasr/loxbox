@@ -30,10 +30,14 @@
  * but does not want to loose all of the data associated to the module.
  */
 
-$sql = "UPDATE `"._DB_PREFIX_."carrier` \n"
+$sql[] = "UPDATE `"._DB_PREFIX_."carrier` \n"
     . "SET deleted = 1\n"
     . "WHERE `"._DB_PREFIX_."carrier`.external_module_name='loxbox'\n"
     . "ORDER BY id_carrier DESC\n";
-if (Db::getInstance()->execute($sql) == false) {
-    return false;
+$sql[] = "DROP TABLE IF EXISTS `"._DB_PREFIX_."loxbox` ";
+
+foreach ($sql as $query) {
+    if (Db::getInstance()->execute($query) == false) {
+        return false;
+    }
 }
