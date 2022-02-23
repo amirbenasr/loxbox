@@ -6,7 +6,6 @@
         var loading = true;
     </script>
 {/literal}
-
     <div class="loxbox-widget">
         {if  {$valid}==200 }
 
@@ -88,6 +87,7 @@
                     }
 
                     function fetchData(map, L) {
+                        alert(Loxbox_TOKEN ?? "loxbox token is not there");
                         $.ajax({
                             type: "GET",
                             url: "https://www.loxbox.tn/api/Relaypoints/",
@@ -414,9 +414,11 @@ ${html}
                   
                     window.onload = function() 
                     {
+
                         setLoader();
                         loadHtml();
                         loadMap(L);
+                        fetchData(map, L);
 
                         removeLoader();
                     }

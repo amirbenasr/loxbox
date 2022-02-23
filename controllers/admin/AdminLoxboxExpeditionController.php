@@ -1,5 +1,7 @@
 <?php
 
+require_once _PS_MODULE_DIR_ . '/loxbox/classes/LoxboxCarrierMethod.php';
+
 class AdminLoxboxExpeditionController extends ModuleAdminController
 {
     protected $fields_form_newMondialrelayCarrier = array();
@@ -9,6 +11,7 @@ class AdminLoxboxExpeditionController extends ModuleAdminController
     {
         $this->bootstrap = true;
         $this->table='loxbox_carrier';
+        $this->className = "LoxboxCarrierMethod";
         // $this->display="view";
 
 
@@ -40,7 +43,7 @@ class AdminLoxboxExpeditionController extends ModuleAdminController
                 'class' => 'fixed-width-xs',
                 
             ),
-            'id_carrier' => array(
+            $this->identifier => array(
                 'title' => 'Native ID Carrier',
                 'filter_key' => 'p_c!id_carrier',
                 'align' => 'center',
@@ -75,12 +78,12 @@ class AdminLoxboxExpeditionController extends ModuleAdminController
             ),
           
   );
-        $description = 'Create a new carrier';
+        // $description = 'Create a new carrier';
         
         $this->fields_form_newMondialrelayCarrier = array(array(
             'form' => array(
                 'legend' => array(
-                    'title' => 'Create a New Carrier',
+                    'title' => 'Ajouter un nouveau transporteur ',
                     'icon' => 'icon-cog'
                 ),
                 'description' => "Ajouter un nouveau transporteur loxbox",
@@ -258,6 +261,56 @@ class AdminLoxboxExpeditionController extends ModuleAdminController
         $range_table = $carrier->getRangeTable();
         $carrier->deleteDeliveryPrice($range_table);
         $carrier->addDeliveryPrice($price_list);
+    }
+
+        /**
+     * Displays a "delete" link; we need it pointing to the AdminCarriers
+     * controller.
+     *
+     * Most of this code is from AdminCarriers
+     *
+     * @param string $token
+     * @param int $id
+     * @param string $name
+     *
+     * @return string
+     */
+    public function displayDeleteLink($token, $id, $name)
+    {
+        $tpl = $this->createTemplate('helpers/list/list_action_delete.tpl');
+
+        if (!array_key_exists('Delete', self::$cache_lang)) {
+            self::$cache_lang['Delete'] = $this->l('Delete', 'Helper');
+        }
+
+        if (!array_key_exists('DeleteItem', self::$cache_lang)) {
+            self::$cache_lang['DeleteItem'] = $this->l('Delete item?', 'Helper');
+        }
+
+        if (!array_key_exists('Name', self::$cache_lang)) {
+            self::$cache_lang['Name'] = $this->l('Name:', 'Helper');
+        }
+
+        if (!is_null($name)) {
+            $name = '\n\n'.self::$cache_lang['Name'].' '.$name;
+        }
+
+        $data = array(
+            $this->identifier => $id,
+            'href' => $this->context->link->getAdminLink('AdminCarriers')
+                . '&id_carrier='.(int)$id
+                . '&deletecarrier=1'
+                . '&action_origin=AdminLoxboxExpeditionController',
+            'action' => self::$cache_lang['Delete'],
+        );
+
+        if ($this->specificConfirmDelete !== false) {
+            $data['confirm'] = !is_null($this->specificConfirmDelete) ? '\r'.$this->specificConfirmDelete : addcslashes(Tools::htmlentitiesDecodeUTF8(self::$cache_lang['DeleteItem'].$name), '\'');
+        }
+
+        $tpl->assign(array_merge($this->tpl_delete_link_vars, $data));
+
+        return $tpl->fetch();
     }
  
  
