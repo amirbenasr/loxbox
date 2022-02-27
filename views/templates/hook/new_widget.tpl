@@ -87,7 +87,6 @@
                     }
 
                     function fetchData(map, L) {
-                        alert(Loxbox_TOKEN ?? "loxbox token is not there");
                         $.ajax({
                             type: "GET",
                             url: "https://www.loxbox.tn/api/Relaypoints/",

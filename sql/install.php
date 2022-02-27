@@ -25,7 +25,7 @@
  */
 $sql = array();
 
-$sql[] = "CREATE TABLE `"._DB_PREFIX_."loxbox_carrier` (
+$sql[] = "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."loxbox_carrier` (
     `id_loxbox_carrier` int(10) unsigned NOT NULL AUTO_INCREMENT,
     `id_carrier` int(10) unsigned NOT NULL,
     `delivery_mode` enum('24R','DRI','LD1','LDS','HOM') NOT NULL,

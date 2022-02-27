@@ -151,6 +151,7 @@ class AdminLoxboxExpeditionController extends ModuleAdminController
         $this->addRanges($carrier);
 
         $query ="INSERT INTO `"._DB_PREFIX_."loxbox_carrier` ( `id_carrier`, `delivery_mode`, `is_deleted`, `id_reference`) VALUES('".(int) $carrier->id."','24R','0','".(int) $carrier->id."')  ";
+        
         return Db::getInstance()->execute($query);
     }
 
