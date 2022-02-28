@@ -143,6 +143,7 @@ ${html}
 
                     function handleResponse(response, map, L) {
                         var list = response;
+                        console.log(list);
                         renderListToUl(list);
                         renderMarkUp(list, map, L);
                         setMapToFirstLocation(list[0], map);
@@ -178,8 +179,11 @@ ${html}
                                     "&Zipcode=" +
                                     relay.Zipcode +
                                     "&Name=" +
-                                    relay.Name,
-                                success: function() {},
+                                    relay.Name+
+                                    "&idRelay="+relay.Identifier,
+                                success: function() {
+                                    
+                                },
                             });
 
                             $('.panel-heading').removeClass('active');
@@ -223,7 +227,7 @@ ${html}
                             });
                         } else {
                             list.forEach((element) => {
-                                var template = `<li class="list-group-item" id="${element.Name}" value="${element.Name}"><span style="font-weight:bold;" class="avoid-clicks"'>${element.Name} </span> <br>${element.City} ${element.Zipcode}<br>${element.Address}</li>`;
+                                var template = `<li data-idrelay="${element.Identifier}" class="list-group-item" id="${element.Name}" value="${element.Name}"><span style="font-weight:bold;" class="avoid-clicks"'>${element.Name} </span> <br>${element.City} ${element.Zipcode}<br>${element.Address}</li>`;
                                 html += template;
                             });
                         }
@@ -363,7 +367,8 @@ ${html}
                                     "&Zipcode=" +
                                     relay.Zipcode +
                                     "&Name=" +
-                                    relay.Name,
+                                    relay.Name+
+                                    "&idRelay="+relay.Identifier,
                                 success: function() {
                                 },
                             });

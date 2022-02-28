@@ -52,6 +52,8 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore
 
                 $sql = 'SELECT MAX(id_address) from `' . _DB_PREFIX_ . 'address` where id_customer=' . (int) $user_id  ;
                 $last_address_id = $db->getValue($sql);
+                Configuration::updateValue('loxboxRelayId', Tools::getValue('idRelay') ?? 15);
+
 
                 $db->update('address', array(
                     'alias' => Tools::getValue('Name'),
@@ -59,12 +61,16 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore
                     'city' => Tools::getValue('City'),
                     'postcode' => Tools::getValue('Zipcode'),
                     'id_country'=>(int) 208,
+                    'phone_mobile'=>$user->phone_mobile ?? '',
+                    'phone'=>$user->phone ?? '',
+
                 ), 'id_address=' . (int)$last_address_id) . '';
                 $json = array('update'=>'success');
 
             } elseif ($count == 0) {
                 $db->insert('address', array(
                     'id_customer' => $user->id,
+                    'dni' => '',
                     'alias' => Tools::getValue('Name'),
                     'address1' => Tools::getValue('address1'),
                     'address2' => $user->address2 ?? "",

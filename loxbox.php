@@ -49,6 +49,7 @@ class Loxbox extends CarrierModule
         $this->addGroups($carrier);
         $this->addRanges($carrier);
         Configuration::updateValue('Loxbox', 'default-token');
+        Configuration::updateValue('loxboxRelayId', 15);
 
         include dirname(__FILE__) . '/sql/install.php';
 
@@ -267,6 +268,8 @@ public function hookHeader($params)
         $query = 'SELECT * FROM `' . _DB_PREFIX_ . 'carrier` WHERE id_carrier=' . $id_carrier;
         $carrier = $db->getRow($query);
         $new_carrier = new Carrier();
+        // var_dump($this->context->cart);
+        // die();
         if($id_carrier!=0)
         {
         $new_carrier->hydrate($carrier);
@@ -276,12 +279,12 @@ public function hookHeader($params)
             'isLoxbox' => $new_carrier->external_module_name == "loxbox" ? true : false,
             'Loxbox_TOKEN' => $token,
         ));
-        
         //test token
         $response = get_web_page('https://www.loxbox.tn/api/Welcome/', $token);
         if ($response == 200) {
          
 
+            
          
         $this->context->controller->registerJavascript(
             'module-loxbox-widget',
@@ -326,41 +329,7 @@ public function hookHeader($params)
         return true;
     }
 
-   public function create_transaction($token)
-{
-    $url="https://www.loxbox.tn/api/NewTransaction/";
-    $ch = curl_init( $url );
-# Setup request to send json via POST.
-$payload = json_encode( array(
 
-    "Content"=>"parfum",
-    "detail"=>"test",
-    "IsPaid"=>0,
-    "Price"=>1.15,
-    "Size"=>3,
-    "Weight"=>7.5,
-    "DestRelaypoint"=>15,
-    "ReceiverName"=>"amirof",
-    "ReceiverMail"=>"amirbennasr@gmail.com",
-    "ReceiverNumber"=>54041337,
-    "ReceiverAddress"=>"cite basatin",
-    "Comment"=>"hi world",
-    "AcceptsCheck"=>0
-
- ) );
-curl_setopt( $ch, CURLOPT_POSTFIELDS, $payload );
-curl_setopt( $ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json','Authorization: Token ' . $token));
-# Return response instead of printing.
-curl_setopt( $ch, CURLOPT_RETURNTRANSFER, false );
-# Send request.
-$result = curl_exec($ch);
-curl_close($ch);
-# Print response.
-echo "<pre>$result</pre>";
-var_dump("testestest");
-
-
-}
 
     public function hookActionValidateOrder($params)
     {
@@ -370,14 +339,54 @@ var_dump("testestest");
         $carrier_id = $params['cart']->id_carrier;
         $cart_id = $params['cart']->id;
         $orderDetails = $params['order'];
+        $customer = $params['customer'];
+        $product_list = $orderDetails->product_list;
+        $content= "";
+        $delivery_address = new Address((int)$orderDetails->id_address_delivery);
+        $payment_method=0;
 
+        if(strcmp($orderDetails->payment,'Payments by check')===0)
+        {
+            $payment_method=1;
+        }
+
+
+			// $formatted_delivery_address = AddressFormat::generateAddress($delivery_address, array(), '<br />', ' ');
+
+        foreach($product_list as $product)
+        {
+            $content .= $product['name'].',';
+        }
+
+        $payload = array(
+
+            "Content"=>$content,
+            "detail"=>"",
+            "IsPaid"=>0,
+            "Price"=>$orderDetails->total_paid ?? 0,
+            "Size"=>3,
+            "Weight"=>$product_list[0]['weight'],
+            "DestRelaypoint"=>Configuration::get('loxboxRelayId') ?? 15,
+            "ReceiverName"=>$customer->firstname.$customer->lastname,
+            "ReceiverMail"=>$customer->email,
+            "ReceiverNumber"=>$delivery_address->phone ?? 0,
+            "ReceiverAddress"=>$delivery_address->address1,
+            "Comment"=>$orderDetails->note ?? "",
+            "AcceptsCheck"=>$payment_method
+        
+         ) ;
+        // var_dump($orderDetails);
+        // var_dump($customer);
+        // var_dump($payload);
+        // var_dump($delivery_address);
+        // var_dump($orderDetails->product_list);
+        // die();
         ///if id carrier belongs to loxbox module
         ///we update the order address_delivery to the latest
         ///delivery of that customer within lopxboxmodule
         $db = Db::getInstance();
 
         $query_1 = 'SELECT * FROM `' . _DB_PREFIX_ . 'carrier` where `id_carrier`=' . $orderDetails->id_carrier . ';';
-        var_dump($query_1);
         $carrier = $db->getRow($query_1);
         $carrier_class = new Carrier();
         $carrier_class->hydrate($carrier);
@@ -391,7 +400,7 @@ var_dump("testestest");
             $orderDetails->id_address_invoice = $db->getValue($sql);
             $orderDetails->update();
             //api call
-            create_transaction($token);
+            makeTransac($token,$payload);
         }
     }
     public function addCarrier()
@@ -509,4 +518,67 @@ function get_web_page($url, $token)
     return $response;
 }
 
+ function makeTransac($token,$payload)
+{
+    
+$curl = curl_init();
+// or use https://httpbin.org/ for testing purposes
+curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+curl_setopt($curl, CURLOPT_URL, 'https://www.loxbox.tn/api/NewTransaction/');
+curl_setopt($curl, CURLOPT_FAILONERROR, true);
+curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+
+//// Require fresh connection
+//curl_setopt($curl, CURLOPT_FRESH_CONNECT, true);
+
+//// Send POST request instead of GET and transfer data
+//$postData = array(
+//    'name' => 'John Doe',
+//    'submit' => '1'
+//);
+//curl_setopt($curl, CURLOPT_POST, true);
+//curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($postData));
+
+//// Use a different request method
+//curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
+//// If the target does not accept custom HTTP methods
+//// then use a regular POST request and a custom header variable
+//curl_setopt($curl, CURLOPT_HTTPHEADER, array('X-HTTP-Method-Override: PUT'));
+//// Note: PHP only converts data of GET queries and POST form requests into
+//// convenient superglobals (»$_GET« & »$_POST«) - To read the incoming
+//// cURL request data you need to access PHPs input stream instead
+//// using »parse_str(file_get_contents('php://input'), $_INPUT);«
+
+//// Send JSON body via POST request
+//$postData = array(
+//    'name' => 'John Doe',
+//    'submit' => '1'
+//);+
+
+curl_setopt($curl, CURLOPT_POST, true);
+curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($payload));
+//// Set headers to send JSON to target and expect JSON as answer
+curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type:application/json', 'Accept:application/json','Authorization: Token '.$token.' '));
+//// As said above, the target script needs to read `php://input`, not `$_POST`!
+
+//// Timeout in seconds
+//curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 0);
+//curl_setopt($curl, CURLOPT_TIMEOUT, 10);
+
+//// Dont verify SSL certificate (eg. self-signed cert in testsystem)
+//curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+//curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+
+$output = curl_exec($curl);
+if ($output === FALSE) {
+    echo 'An error has occurred: ' . curl_error($curl) . PHP_EOL;
+}
+else {
+    echo $output;
+}
+
+
+}
 
