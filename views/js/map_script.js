@@ -1,6 +1,5 @@
 
 $(document).on('ready loadMap','.loxbox-widget',function () {
-
   var container = L.DomUtil.get('map');
       if(container != null){
 
@@ -201,7 +200,7 @@ $(document).on('ready loadMap','.loxbox-widget',function () {
             );
           } else {
             $("#myList").append(
-              ` <li class="list-group-item" id="${element.Name}" value="${element.Name}"><span style="font-weight:bold;">${element.Name} </span> <br>${element.City} ${element.Zipcode}<br>${element.Address}</li>`
+              ` <li class="list-group-item" id="${element.Name}" value="${element.Name}"><p> style="font-weight:bold;">${element.Name} </p> <br>${element.City} ${element.Zipcode}<br>${element.Address}</li>`
             );
           }
 

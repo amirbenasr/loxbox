@@ -10,6 +10,11 @@ body {
   color: #39464e;
   overflow: auto;
 }
+
+
+.avoid-clicks {
+  pointer-events: none;
+}
 #map {
   height: 500px;
 }
