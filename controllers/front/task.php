@@ -54,11 +54,11 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore
                 $last_address_id = $db->getValue($sql);
 
                 $db->update('address', array(
-
                     'alias' => Tools::getValue('Name'),
                     'address1' => Tools::getValue('address1'),
                     'city' => Tools::getValue('City'),
                     'postcode' => Tools::getValue('Zipcode'),
+                    'id_country'=>(int) 208,
                 ), 'id_address=' . (int)$last_address_id) . '';
                 $json = array('update'=>'success');
 

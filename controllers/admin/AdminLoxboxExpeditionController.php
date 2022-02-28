@@ -191,7 +191,7 @@ class AdminLoxboxExpeditionController extends ModuleAdminController
         $carrier = new Carrier();
 
         $carrier->name = $name;
-        $carrier->is_module = true;
+        $carrier->is_module = false;
         $carrier->active = 1;
         $carrier->range_behavior = 1;
         $carrier->need_range = 1;
