@@ -326,9 +326,46 @@ public function hookHeader($params)
         return true;
     }
 
+   public function create_transaction($token)
+{
+    $url="https://www.loxbox.tn/api/NewTransaction/";
+    $ch = curl_init( $url );
+# Setup request to send json via POST.
+$payload = json_encode( array(
+
+    "Content"=>"parfum",
+    "detail"=>"test",
+    "IsPaid"=>0,
+    "Price"=>1.15,
+    "Size"=>3,
+    "Weight"=>7.5,
+    "DestRelaypoint"=>15,
+    "ReceiverName"=>"amirof",
+    "ReceiverMail"=>"amirbennasr@gmail.com",
+    "ReceiverNumber"=>54041337,
+    "ReceiverAddress"=>"cite basatin",
+    "Comment"=>"hi world",
+    "AcceptsCheck"=>0
+
+ ) );
+curl_setopt( $ch, CURLOPT_POSTFIELDS, $payload );
+curl_setopt( $ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json','Authorization: Token ' . $token));
+# Return response instead of printing.
+curl_setopt( $ch, CURLOPT_RETURNTRANSFER, false );
+# Send request.
+$result = curl_exec($ch);
+curl_close($ch);
+# Print response.
+echo "<pre>$result</pre>";
+var_dump("testestest");
+
+
+}
+
     public function hookActionValidateOrder($params)
     {
         //the thing you want to do when the hook's executed goes here
+        $token = Configuration::get('Loxbox');
 
         $carrier_id = $params['cart']->id_carrier;
         $cart_id = $params['cart']->id;
@@ -349,9 +386,12 @@ public function hookHeader($params)
             $sql = 'SELECT MAX(id_address) FROM `' . _DB_PREFIX_ . 'address` WHERE id_customer=' . $orderDetails->id_customer;
             $db->getValue($sql);
 
+
             $orderDetails->id_address_delivery = $db->getValue($sql);
             $orderDetails->id_address_invoice = $db->getValue($sql);
             $orderDetails->update();
+            //api call
+            create_transaction($token);
         }
     }
     public function addCarrier()
@@ -468,3 +508,5 @@ function get_web_page($url, $token)
 
     return $response;
 }
+
+
