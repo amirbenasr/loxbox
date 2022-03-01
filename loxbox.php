@@ -234,6 +234,7 @@ public function hookHeader($params)
         Media::addJsDef(array(
             'isLoxbox' => $new_carrier->external_module_name == "loxbox" ? true : false,
             'Loxbox_TOKEN' => $token,
+            'front_link'=>$this->context->link->getModuleLink('loxbox','task')
         ));
         
         $this->context->controller->registerStylesheet(

@@ -18,7 +18,7 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore
     public function initContent()
     {
         parent::initContent();
-       $json ;
+        $json ;
         $user_id = $this->context->cart->id_customer;
         if (Tools::getValue('ajax') && Tools::getValue("product_id")) {
             $carrier_id = (int)Tools::getValue("product_id");
@@ -45,7 +45,7 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore
 
             $user->hydrate($users[0]);
 
-            $sql = 'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'address` WHERE id_customer=' .(int) $user_id . ' and other="' . $name . '" and id_address=(SELECT max(id_address) FROM `' . _DB_PREFIX_ . 'address`);';
+            $sql = 'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'address` WHERE id_customer=' .(int) $user_id . ' and deleted=0 and other="' . $name . '" and id_address=(SELECT max(id_address) FROM `' . _DB_PREFIX_ . 'address`);';
             $count = $db->getValue($sql);
 
             if ($count != 0) {
@@ -53,7 +53,7 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore
                 $sql = 'SELECT MAX(id_address) from `' . _DB_PREFIX_ . 'address` where id_customer=' . (int) $user_id  ;
                 $last_address_id = $db->getValue($sql);
                 Configuration::updateValue('loxboxRelayId', Tools::getValue('idRelay') ?? 15);
-
+                $address = new Address($last_address_id);
 
                 $db->update('address', array(
                     'alias' => Tools::getValue('Name'),
@@ -61,13 +61,19 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore
                     'city' => Tools::getValue('City'),
                     'postcode' => Tools::getValue('Zipcode'),
                     'id_country'=>(int) 208,
-                    'phone_mobile'=>$user->phone_mobile ?? '',
-                    'phone'=>$user->phone ?? '',
+                    'phone_mobile'=>$address->phone_mobile ?? '',
+                    'phone'=>$address->phone ?? '',
+                    'date_upd'=>date("Y-m-d H:i:s")
+
 
                 ), 'id_address=' . (int)$last_address_id) . '';
                 $json = array('update'=>'success');
 
             } elseif ($count == 0) {
+                $query ="SELECT id_address from `"._DB_PREFIX_."address` WHERE id_customer=" . (int) $user_id  ;
+                $count = $db->getValue($query);
+
+                $address = new Address($count);
                 $db->insert('address', array(
                     'id_customer' => $user->id,
                     'dni' => '',
@@ -82,9 +88,10 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore
                     'other' => $name,
                     'postcode' => Tools::getValue('Zipcode'),
                     'company'=>'',
-                    'phone_mobile'=>$user->phone_mobile ?? '',
-                    'phone'=>$user->phone ?? '',
+                    'phone_mobile'=>$address->phone_mobile ?? '',
+                    'phone'=>$address->phone ?? '',
                     'vat_number'=>$user->vat_number ?? '',
+                    'date_add'=>date("Y-m-d H:i:s")
 
                 ));
                 $json = array(

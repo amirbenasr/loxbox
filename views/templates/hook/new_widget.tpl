@@ -33,9 +33,10 @@
                         <br>
                         <br>
                            <br>
-
                            <ul class="list-group" id="myList">
+                           <div class="panel-group" id="accordion">
 
+                            </div>
                            </ul>
                        </div>
                        <div id="map"></div>
@@ -150,10 +151,10 @@ ${html}
                         loadCitiesToDropDown(list);
                         filterEvent(list);
                         listClickEvent(list, map, L);
-                        panelEvent(list);
+                        panelEvent(list,map,L);
                     }
 
-                    function panelEvent(list) {
+                    function panelEvent(list,map,L) {
                         $('.panel-heading a').click(function(element) {
                             // alert(element.target);
                             var url = element.target.toString().substring(element.target.toString().indexOf('#') + 1,
@@ -166,11 +167,12 @@ ${html}
                             const relay = list.find(
                                 (_element) => _element.Name == _relay
                             );
+                            console.log(relay);
                             // alert(relays[0].City)
                             //ajax call
                             $.ajax({
                                 type: "POST",
-                                url: "localhost/prestashop/en/module/loxbox/task",
+                                url: front_link,
                                 data: "address1=" +
                                     relay.Name + ',' + relay.Address +
                                     "&ajax=1" +
@@ -182,7 +184,10 @@ ${html}
                                     relay.Name+
                                     "&idRelay="+relay.Identifier,
                                 success: function() {
-                                    
+                                    L.popup()
+                            .setLatLng([relay.latitude, relay.Longitude])
+                            .setContent(popupContentMobile(relay))
+                            .openOn(map); 
                                 },
                             });
 
@@ -209,21 +214,30 @@ ${html}
 
                         var html = "";
                         if ($(window).width() <= 768) {
-                            $('#map').hide();
+                           // $('#map').hide();
                             list.forEach((element) => {
-                                var collapsable = `<div  class="panel panel-default" title="${element.Name}">
-                    <div class = "panel-heading"role = "tab" id = "headingTwo" >
-                        <h4 class = "panel-title" >
-                        <a role="button"  data-toggle="collapse" data-parent="#myList" href="#${element.Name}" aria-expanded="false" aria-controls="collapseTwo" value="${element.Name}">
-                        ${element.Name}
-                        </a>  </h4> 
+
+                            var v1 = `
+                            <div id="${element.Name}" class="card loxbox">
+                            <div class="card-header" >
+                              <h5 class="mb-0">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#${element.Identifier}" aria-expanded="true" aria-controls="${element.Identifier}">
+                                  ${element.Name}
+                                </button>
+                              </h5>
+                            </div>
                         
-                        </div>
-                        <div id="${element.Name}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-                        <div class = "panel-body" >
-                        ${getDiv(element)}
-                        </div> </div> </div>`;
-                                html += collapsable;
+                            <div id="${element.Identifier}" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+                              <div class="card-body">
+                              ${getDiv(element)}
+                              </div>
+                            </div>
+                          </div>
+                            
+                            `;
+                               
+                        
+                                html += v1;
                             });
                         } else {
                             list.forEach((element) => {
@@ -232,8 +246,14 @@ ${html}
                             });
                         }
 
+                        if ($(window).width() <= 768)
+                        {
+                    $("#accordion").html(html);
+                        }
+                        else {
+                            $("#myList").html(html);
 
-                        $("#myList").html(html);
+                        }
                     }
 
                     function renderMarkUp(list, map, L) {
@@ -241,7 +261,7 @@ ${html}
                             //create popup
                             var popup = L.popup({ autoPan: true })
                                 .setLatLng([element.latitude, element.Longitude])
-                            .setContent(`${popupContent(element)}`); //setContent of the popup
+                            .setContent(($(window).width() <= 768) ? popupContentMobile(element) : popupContent(element)); //setContent of the popup
                             //create marker
                             L.marker([element.latitude, element.Longitude], {
                                     icon: L.icon({
@@ -255,9 +275,18 @@ ${html}
                                 .addTo(map) //add markers to map
                                 .bindPopup(popup)
                                 .on("click", function(e) {
+                                    collapsePanel(element);
                                     selectMarker(element);
                                 }); //bind poups to marker
                         });
+                    }
+                function collapsePanel(element)
+                {
+                    $(`a[id^="${element.Identifier}"]`).click();
+                }
+                    function popupContentMobile(element)
+                    {
+                        return `${element.Name}`;
                     }
 
 
@@ -316,7 +345,7 @@ ${html}
                                 $("#myList > li").each(function() {
                                     $(this).show();
                                 });
-                                $(".panel").each(function(index, element) {
+                                $(".card.loxbox").each(function(index, element) {
                                     // element == this
                                     $(this).show();
                                 });
@@ -331,9 +360,9 @@ ${html}
                                         $(this).hide();
                                     }
                                 });
-                                $(".panel").each(function(element) {
-
-                                    var element = list.find((element) => element.Name === this.title);
+                                $(".card.loxbox").each(function(element) {
+                                    
+                                    var element = list.find((element) => element.Name === this.id);
                                     if (element.City.toLowerCase() === city.toLowerCase()) {
                                         $(this).show();
                                     } else {
@@ -358,7 +387,7 @@ ${html}
                             //ajax call
                             $.ajax({
                                 type: "POST",
-                                url: "http://localhost/prestashop/en/module/loxbox/task",
+                                url: front_link,
                                 data: "address1=" +
                                     relay.Name + ',' + relay.Address +
                                     "&ajax=1" +

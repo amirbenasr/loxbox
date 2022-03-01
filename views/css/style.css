@@ -88,16 +88,19 @@ p {
 @media (max-width:768px) {
 
   #map {
-    display: none;
+    height: 100%;
+    width: 100%;
+    min-height: 200px;
+
   }
 
   .list {
     width: 100%;
+ 
+   
   }
   
-  .list >  p , label ,#button ,#cityInput, #zipInput {
-    display: none;
-  }
+ 
 }
 
 .image-logo {
