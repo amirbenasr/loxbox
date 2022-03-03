@@ -87,6 +87,10 @@ p {
 
 @media (max-width:768px) {
 
+  .card.loxbox > .card-header.active{
+    background-color: springgreen;
+  }
+
   #map {
     height: 100%;
     width: 100%;

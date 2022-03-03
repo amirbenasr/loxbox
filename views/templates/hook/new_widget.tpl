@@ -155,10 +155,10 @@ ${html}
                     }
 
                     function panelEvent(list,map,L) {
-                        $('.panel-heading a').click(function(element) {
+                        $('.card.loxbox').click(function(element) {
                             // alert(element.target);
-                            var url = element.target.toString().substring(element.target.toString().indexOf('#') + 1,
-                                element.length);
+                            
+                            var url = this.id;
                             url = url.replace('%C3%A9', 'é');
 
                             // alert(url.length);
@@ -167,7 +167,7 @@ ${html}
                             const relay = list.find(
                                 (_element) => _element.Name == _relay
                             );
-                            console.log(relay);
+                            console.log("from panelEvent"+relay);
                             // alert(relays[0].City)
                             //ajax call
                             $.ajax({
@@ -194,14 +194,17 @@ ${html}
                             $('.panel-heading').removeClass('active');
                             $('.icon-check-circle').remove();
 
+                            resetHeaderColor();
+                            $(this).children().first().addClass('active');
+                            console.log($(this).find(':first'));
                             var icon = `<i class="icon-check-circle" style="display:inline-block;padding-left:20px;color:white"></i>`;
-
                             //If the panel was open and would be closed by this click, do not active it
-                            if (!$(this).closest('.panel').find('.panel-collapse').hasClass('in')) {
-                                $(this).parents('.panel-heading').addClass('active');
-                                $(this).parents('.panel-heading > .panel-title').append(icon);
+                            if ($(this).find(':first').attr('aria-expanded')=='false') {
+                           //     $(this).children().first().addClass('active');
 
                             } else {
+                              //  $(this).children().first().removeClass('active');
+
                                 SELECTED = false;
                             $('.icon-check').remove();
 
@@ -210,6 +213,10 @@ ${html}
                         });
                     }
 
+                    function resetHeaderColor()
+                    {
+                      $('.card-header').removeClass('active');
+                    }
                     function renderListToUl(list) {
 
                         var html = "";
@@ -219,7 +226,7 @@ ${html}
 
                             var v1 = `
                             <div id="${element.Name}" class="card loxbox">
-                            <div class="card-header" >
+                            <div class="card-header" data-toggle="collapse" data-target="#${element.Identifier}" >
                               <h5 class="mb-0">
                                 <button class="btn btn-link" data-toggle="collapse" data-target="#${element.Identifier}" aria-expanded="true" aria-controls="${element.Identifier}">
                                   ${element.Name}

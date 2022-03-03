@@ -47,7 +47,7 @@ $(document).on('ready',function () {
   $(".delivery-options").on("change", function () {
     var value = $("input[name^='delivery_option']:checked").val();
     selectedI = value.slice(0, -1);
-    
+   
     $.ajax({
       type: "POST",
       url: "http://localhost/prestashop/en/module/loxbox/task",
