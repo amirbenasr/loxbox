@@ -59,7 +59,7 @@ $(document).on('ready',function () {
         var carrier = body.message;
         console.log(carrier); 
 
-        if (carrier.external_module_name === "loxbox") {
+        if (carrier.external_module_name === "loxbox" && carrier.is_module === "1" ) {
           isLoxbox=true;
           $('.loxbox-widget').show();
           SELECTED=false;
@@ -70,13 +70,9 @@ $(document).on('ready',function () {
           }
 
 
-          // $('.loxbox_container').show();
         } else {
-
-          
-          // $('.loxbox_container').hide();
+          //reset selected to true
           SELECTED=true;
-
           isLoxbox=false;
         }
       },

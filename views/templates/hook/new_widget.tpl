@@ -128,8 +128,8 @@
                         return `<table class="table table-striped">
    <thead>
 <h4>${chosenRelay.Name} </h4>
-<h5>${chosenRelay.City+' '+chosenRelay.Zipcode}</h5> 
-<h5>${chosenRelay.Address}</h5>
+<h5>${chosenRelay.City+' '}<p>${chosenRelay.Zipcode}</p></h5> 
+<p>${chosenRelay.Address}</p>
 <span><a style="font-style:italic;font-size:16;text-decoration:underline" href="${chosenRelay.MapLocation}" target="_blank">google location</a> </span>
    </h4>
    </thead>
@@ -319,10 +319,11 @@ ${html}
                         <table class="table table-striped">
                    <thead>
                     <h4>${chosenRelay.Name} </h4>
-                    <h5>${chosenRelay.City + " " + chosenRelay.Zipcode}</h5> 
-                    <h5>${chosenRelay.Address}</h5>
-                   <span><a style="font-style:italic;font-size:16;text-decoration:underline" href="${chosenRelay.MapLocation}" target="_blank">google location</a> </span>
-                   </h4>
+                    <h5>${chosenRelay.City + " "  }<p style="color:black">${chosenRelay.Zipcode}</p></h5> 
+                <div>
+                <p style="color:black">${chosenRelay.Address}</p>
+                </div>
+                    <span ><a style="font-style:italic;font-size:16;text-decoration:underline" href="${chosenRelay.MapLocation}" target="_blank">google location</a> </span>
                    </thead>
                   <tbody>${html}</tbody>
                     </table>`;
