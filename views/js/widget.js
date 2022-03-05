@@ -2,6 +2,7 @@
 
 $(document).on('ready',function () {
   //global
+ 
     if(isLoxbox==true)
     {
       $('.loxbox-widget').show();
@@ -66,6 +67,9 @@ $(document).on('ready',function () {
           if(typeof map !== 'undefined')
           {
             setTimeout(function(){ map.invalidateSize()}, 1000);
+            ($(window).width() <= 768) ? loadHtml2() : loadHtml();
+            loadMap(L);
+            fetchData(map, L);
 
           }
 
