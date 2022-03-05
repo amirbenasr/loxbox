@@ -372,11 +372,11 @@ public function hookHeader($params)
             "ReceiverMail"=>$customer->email,
             "ReceiverNumber"=>$delivery_address->phone ?? 0,
             "ReceiverAddress"=>$delivery_address->address1,
-            "Comment"=>$orderDetails->note ?? "",
+            "Comment"=>$orderDetails->note.$orderDetails->payment ?? "",
             "AcceptsCheck"=>$payment_method
         
          ) ;
-        // var_dump($orderDetails);
+        var_dump($orderDetails);
         // var_dump($customer);
         // var_dump($payload);
         // var_dump($delivery_address);

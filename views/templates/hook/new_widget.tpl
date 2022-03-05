@@ -16,6 +16,7 @@
                 <script>
                 var map;
                     var SELECTED = false;
+                    var LASTSELECTED = "";
 
                     function loadHtml() {
                         $(".relay-content").html(
@@ -52,12 +53,49 @@
                         );
                     }
 
+                    function loadHtml2() {
+                        $(".relay-content").html(
+                            `<div class="header-label">Localiser un point relais :</div>
+                     <div class="results">
+                     <div id="map"></div>
+                     <div class="alert alert-success" style="display:none" role="alert" id="selected-relay-valid">
+                     <p class="alert-text">Point relais sélectionné - <span id="selectedRelay"></span></p> 
+                     </div> 
+
+                       <div class="list">
+                           <h2>Choisir le point relais le plus proche :</h2>
+                     <label class="col-sm-2" for="city">Ville:</label>
+                     <div class="col-sm-6 col-md-4 wrapper-customer">
+                       <select id="city" class="custom-drop" >
+                       <option>Tous</option>   
+                       </select> 
+                     </div>
+
+                        <br>
+                        <br>
+                           <br>
+                           <ul class="list-group" id="myList">
+                           <div class="panel-group" id="accordion">
+
+                            </div>
+                           </ul>
+                       </div>
+
+                         
+                   </div>
+
+                     </div>
+                   </div>
+                     `
+                        );
+                    }
+
                     function loadMap() {
                          map = L.map("map", {
                                 zoom: 10,
                             })
                             .on("click", function() {
-                                mapSelect();
+                                mapSelect(map);
                             })
                             //center popup
                             .on("popupopen", function(e) {
@@ -157,7 +195,6 @@ ${html}
                     function panelEvent(list,map,L) {
                         $('.card.loxbox').click(function(element) {
                             // alert(element.target);
-                            
                             var url = this.id;
                             url = url.replace('%C3%A9', 'é');
 
@@ -168,6 +205,8 @@ ${html}
                                 (_element) => _element.Name == _relay
                             );
                             console.log("from panelEvent"+relay);
+                            LASTSELECTED=relay.Identifier;
+
                             // alert(relays[0].City)
                             //ajax call
                             $.ajax({
@@ -191,11 +230,11 @@ ${html}
                                 },
                             });
 
-                            $('.panel-heading').removeClass('active');
-                            $('.icon-check-circle').remove();
+                           // $('.panel-heading').removeClass('active');
+                            //$('.icon-check-circle').remove();
 
-                            resetHeaderColor();
-                            $(this).children().first().addClass('active');
+                            //resetHeaderColor();
+                           // $(this).children().first().addClass('active');
                             console.log($(this).find(':first'));
                             var icon = `<i class="icon-check-circle" style="display:inline-block;padding-left:20px;color:white"></i>`;
                             //If the panel was open and would be closed by this click, do not active it
@@ -264,6 +303,8 @@ ${html}
                     }
 
                     function renderMarkUp(list, map, L) {
+
+                      
                         list.forEach((element) => {
                             //create popup
                             var popup = L.popup({ autoPan: true })
@@ -289,10 +330,23 @@ ${html}
                     }
                 function collapsePanel(element)
                 {
-                    $(`a[id^="${element.Identifier}"]`).click();
+                   LASTSELECTED=element.Identifier;
+                   $(`button[data-target="#${element.Identifier}"]`).click();
+
+                    var container = $('.list'),
+                        scrollTo = $(`button[data-target="#${element.Identifier}"]`);
+                     container.animate({
+                        scrollTop: scrollTo.offset().top - container.offset().top + container.scrollTop()
+                    });
+                    $("#selected-relay-valid").show();
+                    $("#selectedRelay").text(element.Name);
+
+                    
+                    
                 }
                     function popupContentMobile(element)
                     {
+                        
                         return `${element.Name}`;
                     }
 
@@ -427,6 +481,10 @@ ${html}
                     }
 
                     function selectMarker(element) {
+                        if ($(window).width() <= 768) 
+                        {
+                            return;
+                        }
                         resetList();
                         $("#selected-relay-valid").show();
                         $("li").each(function() {
@@ -438,7 +496,12 @@ ${html}
                         });
                     }
 
-                    function mapSelect() {
+                    function mapSelect(map) {
+
+                  
+                        $(`button[data-target="#${LASTSELECTED}"]`).click();
+                        LASTSELECTED=null;
+
                         resetList();
                         $("#selected-relay-valid").hide();
                         SELECTED = false;
@@ -457,9 +520,10 @@ ${html}
                   
                     window.onload = function() 
                     {
-
+                        var lastSelected="";
                         setLoader();
-                        loadHtml();
+                        //check if mobile render other html
+                        ($(window).width() <= 768) ? loadHtml2() : loadHtml();
                         loadMap(L);
                         fetchData(map, L);
 
