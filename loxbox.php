@@ -423,7 +423,7 @@ public function hookHeader($params)
         }
 
         if ($carrier->add() == true) {
-            @copy(dirname(__FILE__) . '/Logo-125.jpg', _PS_SHIP_IMG_DIR_ . '/' . (int)$carrier->id . '.jpg');
+            @copy(dirname(__FILE__) . '/views/img/Logo-125.jpg', _PS_SHIP_IMG_DIR_ . '/' . (int)$carrier->id . '.jpg');
             Configuration::updateValue('MYSHIPPINGMODULE_CARRIER_ID', (int)$carrier->id);
             return $carrier;
         }
