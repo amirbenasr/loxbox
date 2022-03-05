@@ -232,7 +232,7 @@ public function hookHeader($params)
 
         }
         Media::addJsDef(array(
-            'isLoxbox' => $new_carrier->external_module_name == "loxbox" ? true : false,
+            'isLoxbox' => ($new_carrier->external_module_name == "loxbox" && $new_carrier->is_module==1) ? true : false,
             'Loxbox_TOKEN' => $token,
             'front_link'=>$this->context->link->getModuleLink('loxbox','task')
         ));
@@ -277,7 +277,7 @@ public function hookHeader($params)
             
         }
         Media::addJsDef(array(
-            'isLoxbox' => $new_carrier->external_module_name == "loxbox" ? true : false,
+            'isLoxbox' => ($new_carrier->external_module_name == "loxbox" && $new_carrier->is_module==1) ? true : false,
             'Loxbox_TOKEN' => $token,
         ));
         //test token
@@ -301,7 +301,7 @@ public function hookHeader($params)
             'valid' => $response,
             'js_inclusion_template' => _PS_ALL_THEMES_DIR_ . 'javascript.tpl',
             'fromAjax' => $this->context->controller->ajax,
-            'isLoxbox' => $new_carrier->external_module_name == "loxbox" ? true : false,
+            'isLoxbox' => ($new_carrier->external_module_name == "loxbox" && $new_carrier->is_module==1 ) ? true : false,
 
 
         ));
