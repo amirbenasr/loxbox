@@ -365,7 +365,7 @@ public function hookHeader($params)
             "detail"=>"",
             "IsPaid"=>0,
             "Price"=>$orderDetails->total_paid ?? 0,
-            "Size"=>3,
+            "Size"=>1,
             "Weight"=>$product_list[0]['weight'],
             "DestRelaypoint"=>Configuration::get('loxboxRelayId') ?? 15,
             "ReceiverName"=>$customer->firstname.$customer->lastname,
@@ -423,7 +423,7 @@ public function hookHeader($params)
         }
 
         if ($carrier->add() == true) {
-            @copy(dirname(__FILE__) . '/views/img/Logo-125.jpg', _PS_SHIP_IMG_DIR_ . '/' . (int)$carrier->id . '.jpg');
+            @copy(dirname(__FILE__) . '/Logo-125.jpg', _PS_SHIP_IMG_DIR_ . '/' . (int)$carrier->id . '.jpg');
             Configuration::updateValue('MYSHIPPINGMODULE_CARRIER_ID', (int)$carrier->id);
             return $carrier;
         }
