@@ -194,7 +194,21 @@ ${html}
                         filterEvent(list);
                         listClickEvent(list, map, L);
                         panelEvent(list,map,L);
+                        panelAllEvent(list);
+                      
                     }
+
+                    function panelAllEvent(list)
+                    {
+                        list.forEach((element)=> {
+                            $('#'+element.Identifier).on('hide.bs.collapse',function(){
+                               
+                            
+                            });
+                        });
+                       
+                    }
+
 
                     function panelEvent(list,map,L) {
                         
@@ -235,31 +249,13 @@ ${html}
                                 success: function() {
                                 if(LASTSELECTED==null) return;
                                 markers[relay.Identifier].openPopup();
-                      //              L.popup()
-                      //      .setLatLng([relay.latitude, relay.Longitude])
-                        //    .setContent(popupContentMobile(relay))
-                       //     .openOn(map); 
+                 
                                 },
                             });
 
-                           // $('.panel-heading').removeClass('active');
-                            //$('.icon-check-circle').remove();
+                            $("#selected-relay-valid").show();
+                            $("#selectedRelay").text(relay.Name);
 
-                            //resetHeaderColor();
-                           // $(this).children().first().addClass('active');
-                            console.log($(this).find(':first'));
-                            var icon = `<i class="icon-check-circle" style="display:inline-block;padding-left:20px;color:white"></i>`;
-                            //If the panel was open and would be closed by this click, do not active it
-                            if ($(this).find(':first').attr('aria-expanded')=='false') {
-                           //     $(this).children().first().addClass('active');
-
-                            } else {
-                              //  $(this).children().first().removeClass('active');
-
-                                SELECTED = false;
-                            $('.icon-check').remove();
-
-                            }
 
                         });
                     }
@@ -279,13 +275,13 @@ ${html}
                             <div id="${element.Name}" class="card loxbox">
                             <div class="card-header" data-toggle="collapse" data-target="#${element.Identifier}" >
                               <h5 class="mb-0">
-                                <button class="btn btn-link" data-toggle="collapse" data-target="#${element.Identifier}" aria-expanded="true" aria-controls="${element.Identifier}">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#${element.Identifier}"  aria-controls="${element.Identifier}">
                                   ${element.Name}
                                 </button>
                               </h5>
                             </div>
                         
-                            <div id="${element.Identifier}" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+                            <div id="${element.Identifier}" class="collapse"  data-parent="#accordion">
                               <div class="card-body">
                               ${getDiv(element)}
                               </div>
@@ -541,6 +537,7 @@ ${html}
                         fetchData(map, L);
 
                         removeLoader();
+                        
                     }
                 </script>
 
