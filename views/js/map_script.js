@@ -287,7 +287,7 @@ $(document).on('ready loadMap','.loxbox-widget',function () {
           //ajax call
           $.ajax({
             type: "POST",
-            url: baseUri + "module/loxbox/task",
+            url: front_link,
             data:
               "address1=" +
              relay.Name+','+ relay.Address +
@@ -367,7 +367,7 @@ $(document).on('ready loadMap','.loxbox-widget',function () {
                      //ajax call
           $.ajax({
             type: "POST",
-            url: baseUri + "module/loxbox/task",
+            url: front_link,
             data:
               "address1=" +
              relay.Name +','+ relay.Address +

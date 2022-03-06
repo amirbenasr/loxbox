@@ -2,7 +2,6 @@
 
 $(document).on('ready',function () {
   //global
- 
     if(isLoxbox==true)
     {
       $('.loxbox-widget').show();
@@ -51,7 +50,7 @@ $(document).on('ready',function () {
    
     $.ajax({
       type: "POST",
-      url: "http://localhost/prestashop/en/module/loxbox/task",
+      url: front_link,
 
       data: "product_id=" + selectedI + "&ajax=1",
       success: function (response) {
