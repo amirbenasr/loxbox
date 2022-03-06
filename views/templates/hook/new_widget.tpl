@@ -95,6 +95,9 @@
                          map = L.map("map", {
                                 zoom: 10,
                             })
+                            .on('popupclose',function() {
+                                mapSelect(map);
+                            })
                             .on("click", function() {
                                 mapSelect(map);
                             })
@@ -194,7 +197,13 @@ ${html}
                     }
 
                     function panelEvent(list,map,L) {
+                        
+                           
+                      
                         $('.card.loxbox').click(function(element) {
+                            $('html, body').animate({
+                                scrollTop: $(".relay-content").offset().top
+                            }, 1000);
                             // alert(element.target);
                             var url = this.id;
                             url = url.replace('%C3%A9', 'é');
