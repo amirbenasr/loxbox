@@ -15,6 +15,7 @@
 
                 <script>
                 var map;
+                var markers = {};
                     var SELECTED = false;
                     var LASTSELECTED = "";
 
@@ -223,10 +224,12 @@ ${html}
                                     relay.Name+
                                     "&idRelay="+relay.Identifier,
                                 success: function() {
-                                    L.popup()
-                            .setLatLng([relay.latitude, relay.Longitude])
-                            .setContent(popupContentMobile(relay))
-                            .openOn(map); 
+                                if(LASTSELECTED==null) return;
+                                markers[relay.Identifier].openPopup();
+                      //              L.popup()
+                      //      .setLatLng([relay.latitude, relay.Longitude])
+                        //    .setContent(popupContentMobile(relay))
+                       //     .openOn(map); 
                                 },
                             });
 
@@ -309,9 +312,10 @@ ${html}
                             //create popup
                             var popup = L.popup({ autoPan: true })
                                 .setLatLng([element.latitude, element.Longitude])
+
                             .setContent(($(window).width() <= 768) ? popupContentMobile(element) : popupContent(element)); //setContent of the popup
                             //create marker
-                            L.marker([element.latitude, element.Longitude], {
+                            markers[element.Identifier] =     L.marker([element.latitude, element.Longitude], {
                                     icon: L.icon({
                                         iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-gold.png",
                                         shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
