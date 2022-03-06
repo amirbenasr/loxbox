@@ -96,7 +96,7 @@
                                 zoom: 10,
                             })
                             .on('popupclose',function() {
-                                mapSelect(map);
+                              if(!($(window).length<=768)  )   mapSelect(map);
                             })
                             .on("click", function() {
                                 mapSelect(map);
@@ -344,13 +344,13 @@ ${html}
 
                     var container = $('.list'),
                         scrollTo = $(`button[data-target="#${element.Identifier}"]`);
-                     container.animate({
-                        scrollTop: scrollTo.offset().top - container.offset().top + container.scrollTop()
-                    });
+                   
                     $("#selected-relay-valid").show();
                     $("#selectedRelay").text(element.Name);
 
-                    
+                    container.animate({
+                        scrollTop: scrollTo.offset().top - container.offset().top + container.scrollTop()
+                    });
                     
                 }
                     function popupContentMobile(element)
@@ -508,8 +508,8 @@ ${html}
                     function mapSelect(map) {
 
                   
-                        $(`button[data-target="#${LASTSELECTED}"]`).click();
-                        LASTSELECTED=null;
+                     //   $(`button[data-target="#${LASTSELECTED}"]`).click();
+                      //  LASTSELECTED=null;
 
                         resetList();
                         $("#selected-relay-valid").hide();

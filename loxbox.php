@@ -368,11 +368,11 @@ public function hookHeader($params)
             "Size"=>1,
             "Weight"=>$product_list[0]['weight'],
             "DestRelaypoint"=>Configuration::get('loxboxRelayId') ?? 15,
-            "ReceiverName"=>$customer->firstname.$customer->lastname,
+            "ReceiverName"=>$customer->firstname.' '.$customer->lastname,
             "ReceiverMail"=>$customer->email,
             "ReceiverNumber"=>$delivery_address->phone ?? 0,
             "ReceiverAddress"=>$delivery_address->address1,
-            "Comment"=>$orderDetails->note.$orderDetails->payment ?? "",
+            "Comment"=>$orderDetails->note.' '.$orderDetails->payment ?? "",
             "AcceptsCheck"=>$payment_method
         
          ) ;
