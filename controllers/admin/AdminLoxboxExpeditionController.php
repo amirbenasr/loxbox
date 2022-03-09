@@ -74,7 +74,7 @@ class AdminLoxboxExpeditionController extends ModuleAdminController
         $options = array(
             array(
               'value' => '24R', 
-              'label' => 'Livraison a un point relais' 
+              'label' => 'Livraison à domicile' 
             ),
           
   );

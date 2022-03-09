@@ -503,6 +503,22 @@ ${html}
                                 SELECTED=true;
                             }
                         });
+                        $.ajax({
+                                type: "POST",
+                                url: front_link,
+                                data: "address1=" +
+                                    element.Name + ',' + element.Address +
+                                    "&ajax=1" +
+                                    "&City=" +
+                                    element.City +
+                                    "&Zipcode=" +
+                                    element.Zipcode +
+                                    "&Name=" +
+                                    element.Name+
+                                    "&idRelay="+element.Identifier,
+                                success: function() {
+                                },
+                            });
                     }
 
                     function mapSelect(map) {

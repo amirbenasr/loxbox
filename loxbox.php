@@ -27,8 +27,8 @@ class Loxbox extends CarrierModule
             'max' => '1.7.99',
         ];
         parent::__construct();
-        $this->displayName = 'loxbox';
-        $this->description = $this->l('Loxbox is the first tunisian product to offer Powerful Relay Solution.');
+        $this->displayName = 'LoxBox Services';
+        $this->description = $this->l('Loxbox is the first tunisian product to offer Powerful Pickup Solution.');
 
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
@@ -408,7 +408,7 @@ public function hookHeader($params)
     {
         $carrier = new Carrier();
 
-        $carrier->name = $this->l('Transporteur Loxbox');
+        $carrier->name = $this->l('Livraison Point Relais LoxBox');
         $carrier->is_module = true;
         $carrier->active = 1;
         $carrier->range_behavior = 1;
