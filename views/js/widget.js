@@ -68,6 +68,7 @@ $(document).on('ready',function () {
             setTimeout(function(){ map.invalidateSize()}, 1000);
             map.closePopup();
             resetList();
+            getUserLocation(map,list);
           //  ($(window).width() <= 768) ? loadHtml2() : loadHtml();
            // loadMap(L);
             //fetchData(map, L);

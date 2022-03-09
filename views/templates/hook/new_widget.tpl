@@ -15,6 +15,7 @@
 
                 <script>
                 var map;
+                var list;
                 var markers = {};
                     var SELECTED = false;
                     var LASTSELECTED = "";
@@ -185,7 +186,7 @@ ${html}
                     }
 
                     function handleResponse(response, map, L) {
-                        var list = response;
+                         list = response;
                         getUserLocation(map,list);
 
                         console.log(list);
