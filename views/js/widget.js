@@ -45,7 +45,6 @@ $(document).on('ready',function () {
     // });
   var selectedI;
   $(".delivery-options").on("change", function () {
-    alert("event ??");
     var value = $("input[name^='delivery_option']:checked").val();
     selectedI = value.slice(0, -1);
    
@@ -61,7 +60,6 @@ $(document).on('ready',function () {
         console.log(carrier); 
 
         if (carrier.external_module_name === "loxbox" && carrier.is_module === "1" ) {
-          alert("did we ?");
           isLoxbox=true;
           $('.loxbox-widget').show();
           SELECTED=false;

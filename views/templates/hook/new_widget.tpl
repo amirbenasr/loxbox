@@ -473,10 +473,8 @@ ${html}
                                 return;
                             } else {
                                 $("#myList > li").each(function() {
-                                    alert(this.id);
                                     var element = list.find((element) => element.Name === this.id);
                                     if (element.City.toLowerCase() === city.toLowerCase()) {
-                                        alert("hiding");
                                         $(this).show();
                                     } else {
                                         $(this).hide();
