@@ -286,7 +286,7 @@ public function hookHeader($params)
          
 
             
-         
+       /*  
         $this->context->controller->registerJavascript(
             'module-loxbox-widget',
             'modules/'.$this->name.'/views/js/widget.js',
@@ -295,6 +295,7 @@ public function hookHeader($params)
               'attribute' => 'async',
             ]
         );
+        */
         }
 
         $this->context->smarty->assign(array(

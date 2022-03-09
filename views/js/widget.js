@@ -45,6 +45,7 @@ $(document).on('ready',function () {
     // });
   var selectedI;
   $(".delivery-options").on("change", function () {
+    alert("event ??");
     var value = $("input[name^='delivery_option']:checked").val();
     selectedI = value.slice(0, -1);
    
@@ -56,19 +57,22 @@ $(document).on('ready',function () {
       success: function (response) {
 
         var body = JSON.parse(response);
-        var carrier = body.message;
+        var carrier = body.message; 
         console.log(carrier); 
 
         if (carrier.external_module_name === "loxbox" && carrier.is_module === "1" ) {
+          alert("did we ?");
           isLoxbox=true;
           $('.loxbox-widget').show();
           SELECTED=false;
           if(typeof map !== 'undefined')
           {
             setTimeout(function(){ map.invalidateSize()}, 1000);
-            ($(window).width() <= 768) ? loadHtml2() : loadHtml();
-            loadMap(L);
-            fetchData(map, L);
+            map.closePopup();
+            resetList();
+          //  ($(window).width() <= 768) ? loadHtml2() : loadHtml();
+           // loadMap(L);
+            //fetchData(map, L);
 
           }
 

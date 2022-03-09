@@ -186,6 +186,8 @@ ${html}
 
                     function handleResponse(response, map, L) {
                         var list = response;
+                        getUserLocation(map,list);
+
                         console.log(list);
                         renderListToUl(list);
                         renderMarkUp(list, map, L);
@@ -196,6 +198,53 @@ ${html}
                         panelEvent(list,map,L);
                         panelAllEvent(list);
                       
+                    }
+
+
+
+                    function getUserLocation(map,list)
+                    {
+                        navigator.geolocation.getCurrentPosition((position)=>loadUserLocation(position,map,list),notAllow(map,list));
+                           
+                    }
+                    function measure(lat1, lon1, lat2, lon2){  // generally used geo measurement function
+    var R = 6378.137; // Radius of earth in KM
+    var dLat = lat2 * Math.PI / 180 - lat1 * Math.PI / 180;
+    var dLon = lon2 * Math.PI / 180 - lon1 * Math.PI / 180;
+    var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    var d = R * c;
+    return d * 1000; // meters
+}
+
+                   function loadUserLocation(position,map,list)
+                    {
+                        let coords = position.coords;
+                        var obj = {'latitude':list[0].latitude,'longitude':list[0].Longitude};
+
+                        var min = measure(coords.latitude,coords.longitude,obj.latitude,obj.longitude);
+                        let minIndex = 0;
+                       
+                        for(let i=0;i<list.length;i++)
+                        {
+                            var obj = {'latitude':list[i].latitude,'longitude':list[i].Longitude};
+                            if(measure(coords.latitude,coords.longitude,obj.latitude,obj.longitude) < min)
+                            {
+                                min = measure(coords.latitude,coords.longitude,obj.latitude,obj.Longitude);
+                                minIndex=i;
+                            }
+
+                        }
+                        console.log(minIndex,min);
+                        setMapToFirstLocation(list[minIndex], map);
+
+                        
+                    }
+                    function notAllow(map,list)
+                    {
+                        setMapToFirstLocation(list[0], map);
                     }
 
                     function panelAllEvent(list)
@@ -394,7 +443,7 @@ ${html}
 
                     function setMapToFirstLocation(element, map) {
                         if (element != "undefined") {
-                            map.setView([element.latitude, element.Longitude], 10);
+                            map.setView([element.latitude, element.Longitude], 11);
                         }
                     }
 
@@ -424,8 +473,10 @@ ${html}
                                 return;
                             } else {
                                 $("#myList > li").each(function() {
+                                    alert(this.id);
                                     var element = list.find((element) => element.Name === this.id);
                                     if (element.City.toLowerCase() === city.toLowerCase()) {
+                                        alert("hiding");
                                         $(this).show();
                                     } else {
                                         $(this).hide();

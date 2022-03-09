@@ -1,7 +1,19 @@
 <?php
 
+
+function getTunisiaCode()
+{
+    $db = Db::getInstance();
+    $query ="SELECT id_country from `"._DB_PREFIX_."country` WHERE iso_code='TN'"  ;
+    $id = $db->getValue($query);
+
+    return $id;
+}
+
 class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore
 {
+
+
 
     public function __construct()
     {
@@ -20,6 +32,7 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore
         parent::initContent();
         $json ;
         $user_id = $this->context->cart->id_customer;
+        $id_country = getTunisiaCode();
         if (Tools::getValue('ajax') && Tools::getValue("product_id")) {
             $carrier_id = (int)Tools::getValue("product_id");
             $carrier = new Carrier();
@@ -60,7 +73,7 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore
                     'address1' => Tools::getValue('address1'),
                     'city' => Tools::getValue('City'),
                     'postcode' => Tools::getValue('Zipcode'),
-                    'id_country'=>(int) 208,
+                    'id_country'=>(int) $id_country,
                     'phone_mobile'=>$address->phone_mobile ?? '',
                     'phone'=>$address->phone ?? '',
                     'date_upd'=>date("Y-m-d H:i:s")
@@ -83,7 +96,7 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore
                     'firstname' => $user->firstname,
                     'lastname' => $user->lastname,
                     'city' => Tools::getValue('City'),
-                    'id_country' => 208,
+                    'id_country' => $id_country,
                     'id_state' => 0,
                     'other' => $name,
                     'postcode' => Tools::getValue('Zipcode'),
@@ -103,7 +116,7 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore
                     'lastname' => $user->lastname,
                     'id_customer' => (int)$user_id,
                     'city' => Tools::getValue('City'),
-                    'id_country' => 208,
+                    'id_country' => $id_country,
                     'other' => $name,
                     'sql' => $sql,
                     'postcode' => Tools::getValue('Zipcode'),
@@ -116,4 +129,6 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore
         die(Tools::jsonEncode($json));
     }
 
+  
 }
+
