@@ -173,7 +173,7 @@
 <h4>${chosenRelay.Name} </h4>
 <h5>${chosenRelay.City+' '}<p>${chosenRelay.Zipcode}</p></h5> 
 <p>${chosenRelay.Address}</p>
-<span><a style="font-style:italic;font-size:16;text-decoration:underline" href="${chosenRelay.MapLocation}" target="_blank">google location</a> </span>
+<span><a style="font-style:italic;font-size:16;text-decoration:underline" href="${chosenRelay.MapLocation}" target="_blank">Localiser sur Google maps</a> </span>
    </h4>
    </thead>
 
