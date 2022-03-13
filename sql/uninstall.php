@@ -35,6 +35,7 @@ $sql[] = "UPDATE `"._DB_PREFIX_."carrier` \n"
     . "WHERE `"._DB_PREFIX_."carrier`.external_module_name='loxbox'\n"
     . "ORDER BY id_carrier DESC\n";
 $sql[] = "DROP TABLE IF EXISTS `"._DB_PREFIX_."loxbox` ";
+$sql[] = "DROP TABLE IF EXISTS `"._DB_PREFIX_."loxbox_last` ";
 
 foreach ($sql as $query) {
     if (Db::getInstance()->execute($query) == false) {

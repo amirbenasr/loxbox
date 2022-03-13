@@ -41,11 +41,15 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore
 
             $carrier->hydrate($db->getRow($query));
 
+            
+
             $json = array(
                 'status' => 'error',
                 'message' => $carrier,
                 'token' => Configuration::get('Loxbox'),
             );
+
+
 
         } elseif (Tools::getValue('address1') && Tools::getValue('ajax')) {
             $name = "Loxbox";
@@ -61,6 +65,9 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore
             $sql = 'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'address` WHERE id_customer=' .(int) $user_id . ' and deleted=0 and other="' . $name . '" and id_address=(SELECT max(id_address) FROM `' . _DB_PREFIX_ . 'address`);';
             $count = $db->getValue($sql);
 
+            $query_5 = 'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'loxbox_last` WHERE id_cart=' .(int) $this->context->cart->id ;
+            $selectCount = $db->getValue($query_5);
+           
             if ($count != 0) {
 
                 $sql = 'SELECT MAX(id_address) from `' . _DB_PREFIX_ . 'address` where id_customer=' . (int) $user_id  ;
@@ -77,9 +84,21 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore
                     'phone_mobile'=>$address->phone_mobile ?? '',
                     'phone'=>$address->phone ?? '',
                     'date_upd'=>date("Y-m-d H:i:s")
-
-
                 ), 'id_address=' . (int)$last_address_id) . '';
+                if($selectCount !=0)
+                {
+                    $db->update('loxbox_last', array(
+                        'id_cart' => $this->context->cart->id,
+                        'id_carrier' => Tools::getValue('idRelay'),
+                    ), 'id_cart=' . (int)$this->context->cart->id) . '';
+                }
+                else if($selectCount==0){
+                    $db->insert('loxbox_last', array(
+                        'id_cart' => $this->context->cart->id,
+                        'id_carrier' => Tools::getValue('idRelay')));
+                }
+              
+                
                 $json = array('update'=>'success');
 
             } elseif ($count == 0) {
@@ -107,6 +126,11 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore
                     'date_add'=>date("Y-m-d H:i:s")
 
                 ));
+                
+                $db->insert('loxbox_last', array(
+                    'id_cart' => $this->context->cart->id,
+                    'id_carrier' => Tools::getValue('idRelay')));
+
                 $json = array(
                     'status' => 'error',
                     'name' => $name,

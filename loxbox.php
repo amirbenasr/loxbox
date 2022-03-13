@@ -337,6 +337,7 @@ public function hookHeader($params)
     {
         //the thing you want to do when the hook's executed goes here
         $token = Configuration::get('Loxbox');
+        $db = Db::getInstance();
 
         $carrier_id = $params['cart']->id_carrier;
         $cart_id = $params['cart']->id;
@@ -359,25 +360,25 @@ public function hookHeader($params)
         {
             $content .= $product['name'].',';
         }
+        $fetch_carrier_query = 'SELECT `id_carrier`  FROM `'._DB_PREFIX_.'loxbox_last` WHERE id_cart= '.$cart_id;
+
+       
 
         $payload = array(
-
-            "Content"=>$content,
+            "Content"=>$content ?? "",
             "detail"=>"",
             "IsPaid"=>0,
             "Price"=>$orderDetails->total_paid ?? 0,
             "Size"=>1,
             "Weight"=>$product_list[0]['weight'],
-            "DestRelaypoint"=>Configuration::get('loxboxRelayId') ?? 15,
+            "DestRelaypoint"=> $db->getValue($fetch_carrier_query)?? 15,
             "ReceiverName"=>$customer->firstname.' '.$customer->lastname,
             "ReceiverMail"=>$customer->email,
-            "ReceiverNumber"=>$delivery_address->phone ?? 0,
-            "ReceiverAddress"=>$delivery_address->address1,
+            "ReceiverNumber"=> empty($delivery_address->phone ?? "") ? 000000 :$delivery_address->phone ,
+            "ReceiverAddress"=>$delivery_address->address1 ?? "",
             "Comment"=>$orderDetails->note.' '.$orderDetails->payment ?? "",
-            "AcceptsCheck"=>$payment_method
-        
+            "AcceptsCheck"=>$payment_method        
          ) ;
-        var_dump($orderDetails);
         // var_dump($customer);
         // var_dump($payload);
         // var_dump($delivery_address);
@@ -386,7 +387,6 @@ public function hookHeader($params)
         ///if id carrier belongs to loxbox module
         ///we update the order address_delivery to the latest
         ///delivery of that customer within lopxboxmodule
-        $db = Db::getInstance();
 
         $query_1 = 'SELECT * FROM `' . _DB_PREFIX_ . 'carrier` where `id_carrier`=' . $orderDetails->id_carrier . ';';
         $carrier = $db->getRow($query_1);
@@ -394,6 +394,7 @@ public function hookHeader($params)
         $carrier_class->hydrate($carrier);
 
         if ($carrier_class->external_module_name == 'loxbox') {
+
             $sql = 'SELECT MAX(id_address) FROM `' . _DB_PREFIX_ . 'address` WHERE id_customer=' . $orderDetails->id_customer;
             $db->getValue($sql);
 

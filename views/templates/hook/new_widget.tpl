@@ -436,7 +436,7 @@ ${html}
                 <div>
                 <p style="color:black">${chosenRelay.Address}</p>
                 </div>
-                    <span ><a style="font-style:italic;font-size:16;text-decoration:underline" href="${chosenRelay.MapLocation}" target="_blank">google location</a> </span>
+                    <span ><a style="font-style:italic;font-size:16;text-decoration:underline" href="${chosenRelay.MapLocation}" target="_blank">Localiser sur Google maps</a> </span>
                    </thead>
                   <tbody>${html}</tbody>
                     </table>`;

@@ -36,6 +36,11 @@ $sql[] = "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."loxbox_carrier` (
     PRIMARY KEY (`id_loxbox_carrier`)
   ) ENGINE= ". _MYSQL_ENGINE_ ." DEFAULT CHARSET=utf8";
 
+  $sql[] = "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."loxbox_last` (
+    `id_cart` int(10) unsigned NOT NULL,
+    `id_carrier` int(10) unsigned NOT NULL,  
+    PRIMARY KEY (`id_cart`)
+  ) ENGINE= ". _MYSQL_ENGINE_ ." DEFAULT CHARSET=utf8";
 
 foreach ($sql as $query) {
     if (Db::getInstance()->execute($query) == false) {
