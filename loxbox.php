@@ -18,7 +18,7 @@ class Loxbox extends CarrierModule
     public function __construct()
     {
         $this->name = 'loxbox';
-        $this->version = '1.0.0';
+        $this->version = '1.0.1';
         $this->author = 'LoxboxDev';
         $this->need_instance = 1;
         $this->bootstrap = true;
