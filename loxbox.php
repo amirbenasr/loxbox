@@ -28,7 +28,7 @@ class Loxbox extends CarrierModule
         ];
         parent::__construct();
         $this->displayName = 'LoxBox Services';
-        $this->description = $this->l('Loxbox is the first tunisian product to offer Powerful Pickup Solution.');
+        $this->description = $this->l('Loxbox is the first tunisian product to offer Intelligent Pickup Solution.');
 
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
