@@ -2,6 +2,7 @@
 
 $(document).on('ready',function () {
   //global
+  alert(isLoxbox);
     if(isLoxbox==true)
     {
       $('.loxbox-widget').show();

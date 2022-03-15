@@ -69,12 +69,13 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore
             $selectCount = $db->getValue($query_5);
            
             if ($count != 0) {
+              
 
                 $sql = 'SELECT MAX(id_address) from `' . _DB_PREFIX_ . 'address` where id_customer=' . (int) $user_id  ;
                 $last_address_id = $db->getValue($sql);
                 Configuration::updateValue('loxboxRelayId', Tools::getValue('idRelay') ?? 15);
                 $address = new Address($last_address_id);
-
+              
                 $db->update('address', array(
                     'alias' => Tools::getValue('Name'),
                     'address1' => Tools::getValue('address1'),
@@ -102,6 +103,13 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore
                 $json = array('update'=>'success');
 
             } elseif ($count == 0) {
+                Configuration::updateValue('loxboxRelayId', Tools::getValue('idRelay') ?? 15);
+               
+
+                $db->insert('loxbox_last', array(
+                    'id_cart' => $this->context->cart->id,
+                    'id_carrier' => Tools::getValue('idRelay') ?? 0));
+
                 $query ="SELECT id_address from `"._DB_PREFIX_."address` WHERE id_customer=" . (int) $user_id  ;
                 $count = $db->getValue($query);
 
@@ -126,10 +134,26 @@ class LoxboxTaskModuleFrontController extends ModuleFrontControllerCore
                     'date_add'=>date("Y-m-d H:i:s")
 
                 ));
-                
-                $db->insert('loxbox_last', array(
-                    'id_cart' => $this->context->cart->id,
-                    'id_carrier' => Tools::getValue('idRelay')));
+
+                $sql = 'SELECT MAX(id_address) from `' . _DB_PREFIX_ . 'address` where id_customer=' . (int) $user_id  ;
+                $last_address_id = $db->getValue($sql);
+
+                $address = new Address($last_address_id);
+
+                $db->update('address', array(
+                    'alias' => Tools::getValue('Name'),
+                    'address1' => Tools::getValue('address1'),
+                    'city' => Tools::getValue('City'),
+                    'postcode' => Tools::getValue('Zipcode'),
+                    'id_country'=>(int) $id_country,
+                    'phone_mobile'=>$address->phone_mobile ?? '',
+                    'phone'=>$address->phone ?? '',
+                    'date_upd'=>date("Y-m-d H:i:s")
+                ), 'id_address=' . (int)$last_address_id) . '';
+              
+                // $cart = new Cart($this->context->cart->id);
+                // $cart->id_address=$last_address_id;
+                // $cart->save();
 
                 $json = array(
                     'status' => 'error',

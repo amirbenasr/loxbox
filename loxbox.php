@@ -219,20 +219,29 @@ public function hookHeader($params)
     if ('order' === $this->context->controller->php_self) {
         
         $token = Configuration::get('Loxbox');
-        $id_carrier = $this->context->cart->id_carrier;
+        // $id_carrier = $this->context->cart->id_carrier;
         $db = Db::getInstance();
+        $id_carrier =  Configuration::get('PS_CARRIER_DEFAULT');
         $query = 'SELECT * FROM `' . _DB_PREFIX_ . 'carrier` WHERE id_carrier=' .(int) $id_carrier;
         // var_dump($query);
+
         
         $carrier = $db->getRow($query);
         $new_carrier = new Carrier();
+        $isloxbox=false;
         if($id_carrier!=0)
         {
             $new_carrier->hydrate($carrier);
 
         }
-        Media::addJsDef(array(
-            'isLoxbox' => ($new_carrier->external_module_name == "loxbox" && $new_carrier->is_module==1) ? true : false,
+       
+        if(($new_carrier->external_module_name == "loxbox" && $new_carrier->is_module==1) )
+        {
+            $isloxbox=true;
+        }
+      
+                Media::addJsDef(array(
+            'isLoxbox' => $isloxbox,
             'Loxbox_TOKEN' => $token,
             'front_link'=>$this->context->link->getModuleLink('loxbox','task')
         ));
@@ -383,7 +392,7 @@ public function hookHeader($params)
         // var_dump($payload);
         // var_dump($delivery_address);
         // var_dump($orderDetails->product_list);
-        // die();
+        //  die();
         ///if id carrier belongs to loxbox module
         ///we update the order address_delivery to the latest
         ///delivery of that customer within lopxboxmodule
@@ -397,11 +406,10 @@ public function hookHeader($params)
 
             $sql = 'SELECT MAX(id_address) FROM `' . _DB_PREFIX_ . 'address` WHERE id_customer=' . $orderDetails->id_customer;
             $db->getValue($sql);
-
-
             $orderDetails->id_address_delivery = $db->getValue($sql);
             $orderDetails->id_address_invoice = $db->getValue($sql);
             $orderDetails->update();
+
             //api call
             makeTransac($token,$payload);
         }
