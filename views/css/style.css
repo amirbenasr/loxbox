@@ -11,6 +11,10 @@ body {
   overflow: auto;
 }
 
+#selectedRelay
+{
+  font-weight: bold;
+}
 
 .avoid-clicks {
   pointer-events: none;

@@ -385,7 +385,7 @@ public function hookHeader($params)
             "ReceiverMail"=>$customer->email,
             "ReceiverNumber"=> empty($delivery_address->phone ?? "") ? 000000 :$delivery_address->phone ,
             "ReceiverAddress"=>$delivery_address->address1 ?? "",
-            "Comment"=>$orderDetails->note.' '.$orderDetails->payment ?? "",
+            "Comment"=>$orderDetails->reference.' | '.$orderDetails->note.' | '.$orderDetails->payment ?? "",
             "AcceptsCheck"=>$payment_method        
          ) ;
         // var_dump($customer);

@@ -1,7 +1,6 @@
 
 <div  class="panel clearfix">
-<div>
-  <img  src="/prestashop/modules/loxbox/views/img/loxbox_hd_2.png" class="pull-left loxbox-img">
+<div class="pull-left loxbox-img">
 </div>
 <div>
   <p>
